@@ -8,8 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    ArrayList<Device> devices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,15 +22,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setupDeviceList();
     }
 
     @Override
@@ -48,5 +45,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setupDeviceList() {
+        devices = new ArrayList<>();
+        for (int i=0;i<3;i++) {
+            Device newDevice = new Device(Constants.WD_DEVICE, null, null);
+            devices.add(newDevice);
+        }
+        ListView deviceList = findViewById(R.id.device_list_view);
+        deviceList.setAdapter(new DeviceListAdapter(this, devices));
     }
 }
