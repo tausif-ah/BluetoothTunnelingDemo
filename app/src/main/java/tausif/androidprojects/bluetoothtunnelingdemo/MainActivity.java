@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Device> devices;
+    DeviceListAdapter deviceListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +50,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void setupDeviceList() {
         devices = new ArrayList<>();
-        for (int i=0;i<3;i++) {
-            Device newDevice = new Device(Constants.WD_DEVICE, null, null);
-            devices.add(newDevice);
-        }
         ListView deviceList = findViewById(R.id.device_list_view);
-        deviceList.setAdapter(new DeviceListAdapter(this, devices));
+        deviceListAdapter = new DeviceListAdapter(this, devices);
+        deviceList.setAdapter(deviceListAdapter);
+    }
+
+    public void discoveryFinished(ArrayList<Device> WDDevices) {
+        devices = WDDevices;
+        deviceListAdapter.notifyDataSetChanged();
     }
 }
