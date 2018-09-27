@@ -1,40 +1,33 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.net.wifi.WpsInfo;
-import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PeerDiscoveryController {
+class PeerDiscoveryController {
 
     private Context context;
     private MainActivity mainActivity;
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
-//    private PeerDiscoveryBroadcastReceiver peerDiscoveryBroadcastReceiver;
+    private PeerDiscoveryBroadcastReceiver peerDiscoveryBroadcastReceiver;
     private IntentFilter intentFilter;
     private ArrayList<Device> wifiDevices;
 
     PeerDiscoveryController(Context context, MainActivity mainActivity) {
         this.context = context;
         this.mainActivity = mainActivity;
-//        peerDiscoveryBroadcastReceiver = new PeerDiscoveryBroadcastReceiver();
-//        peerDiscoveryBroadcastReceiver.setPeerDiscoveryController(this);
-//        peerDiscoveryBroadcastReceiver.setSourceActivity(this.homeActivity);
+        peerDiscoveryBroadcastReceiver = new PeerDiscoveryBroadcastReceiver();
+        peerDiscoveryBroadcastReceiver.setPeerDiscoveryController(this);
         intentFilter = new IntentFilter();
         configureWiFiDiscovery();
-//        context.registerReceiver(peerDiscoveryBroadcastReceiver, intentFilter);
+        context.registerReceiver(peerDiscoveryBroadcastReceiver, intentFilter);
         wifiDevices = new ArrayList<>();
         wifiP2pManager.discoverPeers(channel, null);
         Timer timer = new Timer();
@@ -44,15 +37,15 @@ public class PeerDiscoveryController {
     private void configureWiFiDiscovery() {
         wifiP2pManager = (WifiP2pManager)context.getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(context, context.getMainLooper(), null);
-//        peerDiscoveryBroadcastReceiver.setWifiP2pManager(wifiP2pManager);
-//        peerDiscoveryBroadcastReceiver.setChannel(channel);
+        peerDiscoveryBroadcastReceiver.setWifiP2pManager(wifiP2pManager);
+        peerDiscoveryBroadcastReceiver.setChannel(channel);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    public void wifiDeviceDiscovered(WifiP2pDeviceList deviceList) {
+    void wifiDeviceDiscovered(WifiP2pDeviceList deviceList) {
         if (wifiDevices.size()>0)
             wifiDevices.clear();
         for (WifiP2pDevice device: deviceList.getDeviceList()

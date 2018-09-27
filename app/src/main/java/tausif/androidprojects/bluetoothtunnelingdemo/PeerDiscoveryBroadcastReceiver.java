@@ -1,11 +1,8 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.NetworkInfo;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 
@@ -13,7 +10,6 @@ public class PeerDiscoveryBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
-    private MainActivity sourceActivity;
     private PeerDiscoveryController peerDiscoveryController;
 
     public void setWifiP2pManager(WifiP2pManager wifiP2pManager) {
@@ -26,10 +22,6 @@ public class PeerDiscoveryBroadcastReceiver extends BroadcastReceiver {
 
     public void setPeerDiscoveryController(PeerDiscoveryController peerDiscoveryController) {
         this.peerDiscoveryController = peerDiscoveryController;
-    }
-
-    public void setSourceActivity(MainActivity sourceActivity) {
-        this.sourceActivity = sourceActivity;
     }
 
     @Override

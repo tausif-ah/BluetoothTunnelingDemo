@@ -11,12 +11,10 @@ import java.util.ArrayList;
 
 public class DeviceListAdapter extends BaseAdapter {
 
-    private Context context;
     private LayoutInflater inflater;
     private ArrayList<Device> devices;
 
     DeviceListAdapter(Context context, ArrayList<Device> devices) {
-        this.context = context;
         this.devices = devices;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -41,7 +39,9 @@ public class DeviceListAdapter extends BaseAdapter {
         Device currentDevice = devices.get(i);
         view = inflater.inflate(R.layout.device_list_row, viewGroup, false);
         TextView device_name = view.findViewById(R.id.device_name_textview);
-        device_name.setText(String.valueOf(currentDevice.deviceType));
+        if (currentDevice.deviceType == Constants.WD_DEVICE) {
+            device_name.setText(currentDevice.WDDevice.deviceName);
+        }
         return view;
     }
 }
