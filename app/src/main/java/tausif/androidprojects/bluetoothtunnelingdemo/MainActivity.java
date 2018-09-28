@@ -58,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void discoveryFinished(ArrayList<Device> WDDevices) {
-        devices = WDDevices;
-        deviceListAdapter.notifyDataSetChanged();
+        devices.clear();
+        devices.addAll(WDDevices);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                deviceListAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
