@@ -7,16 +7,24 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="6"
+        android:layout_weight="1"
         android:gravity="center"
         android:id="@+id/device_name_textview"/>
 
     <Button
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4"
-        android:id="@+id/join_send_button"
+        android:layout_weight="1"
+        android:id="@+id/crt_grp_button"
+        android:background="@android:color/holo_blue_light"
+        android:text="@string/crtGrp"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/join_grp_button"
         android:background="@android:color/holo_green_light"
-        android:text="@string/join"/>
+        android:text="@string/joinGrp"/>
 
 </LinearLayout>
