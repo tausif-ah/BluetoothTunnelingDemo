@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class DeviceListAdapter extends BaseAdapter {
         if (currentDevice.deviceType == Constants.WD_DEVICE) {
             device_name.setText(currentDevice.WDDevice.deviceName);
         }
+        Button joinGrp = view.findViewById(R.id.join_grp_button);
+        joinGrp.setTag(i);
         return view;
     }
 }

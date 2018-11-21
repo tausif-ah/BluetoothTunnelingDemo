@@ -3,6 +3,7 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -75,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void joinGrpButtonPressed(View view) {
-
+        int tag = (int)view.getTag();
+        Device device = devices.get(tag);
+        Log.d("device name", device.WDDevice.deviceName);
+        peerDiscoveryController.joinGrp(device);
     }
 }

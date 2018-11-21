@@ -1,7 +1,10 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
-public class Constants {
-    public static final int WD_DEVICE = 101;
-    public static final int BT_DEVICE = 102;
-    public static final int TIME_SLOT_LENGTH = 10; //IN SECONDS
+import java.net.InetAddress;
+
+class Constants {
+    static final int WD_DEVICE = 101;
+    static final int TIME_SLOT_LENGTH = 10; //IN SECONDS
+    static InetAddress groupOwnerAddress;
+    static boolean isGroupOwner;
 }

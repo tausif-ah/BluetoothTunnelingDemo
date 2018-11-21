@@ -2,16 +2,20 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class PeerDiscoveryController {
+class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
 
     private Context context;
     private MainActivity mainActivity;
@@ -77,10 +81,23 @@ class PeerDiscoveryController {
         });
     }
 
-//    @Override
-//    public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
-//        Constants.groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
-//        Constants.isGroupOwner = wifiP2pInfo.isGroupOwner;
-//        homeActivity.connectionEstablished(Constants.WIFI_DIRECT_CONNECTION, null);
-//    }
+    void joinGrp(Device device) {
+        Log.d("inside", "join group");
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.WDDevice.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+        config.groupOwnerIntent = 0;
+        wifiP2pManager.connect(channel, config, null);
+    }
+
+    @Override
+    public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
+        Log.d("group", "formed");
+        Constants.groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
+        Constants.isGroupOwner = wifiP2pInfo.isGroupOwner;
+        if (Constants.isGroupOwner)
+            Toast.makeText(context, "group owner", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(context, "client", Toast.LENGTH_LONG).show();
+    }
 }
