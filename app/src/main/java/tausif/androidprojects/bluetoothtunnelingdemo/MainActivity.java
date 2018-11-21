@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<Device> devices;
     DeviceListAdapter deviceListAdapter;
+    PeerDiscoveryController peerDiscoveryController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initiateDeviceDiscovery() {
-        PeerDiscoveryController peerDiscoveryController = new PeerDiscoveryController(this, this);
+        peerDiscoveryController = new PeerDiscoveryController(this, this);
     }
 
     public void discoveryFinished(ArrayList<Device> WDDevices) {
@@ -66,5 +68,13 @@ public class MainActivity extends AppCompatActivity {
                 deviceListAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    public void crtGrpButtonPressed(View view) {
+        peerDiscoveryController.createGrp();
+    }
+
+    public void joinGrpButtonPressed(View view) {
+
     }
 }

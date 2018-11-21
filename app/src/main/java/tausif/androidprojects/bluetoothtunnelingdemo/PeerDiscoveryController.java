@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -60,6 +61,20 @@ class PeerDiscoveryController {
         public void run() {
             mainActivity.discoveryFinished(wifiDevices);
         }
+    }
+
+    void createGrp() {
+        wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "Group created", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Toast.makeText(context, "Group creation failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 //    @Override

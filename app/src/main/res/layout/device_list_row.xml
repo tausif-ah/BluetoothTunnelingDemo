@@ -15,16 +15,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:id="@+id/crt_grp_button"
-        android:background="@android:color/holo_blue_light"
-        android:text="@string/crtGrp"/>
-
-    <Button
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
         android:id="@+id/join_grp_button"
-        android:background="@android:color/holo_green_light"
-        android:text="@string/joinGrp"/>
+        android:background="@android:color/holo_blue_light"
+        android:text="@string/joinGrp"
+        android:onClick="joinGrpButtonPressed"/>
 
 </LinearLayout>
