@@ -43,8 +43,8 @@ public class DeviceListAdapter extends BaseAdapter {
         if (currentDevice.deviceType == Constants.WD_DEVICE) {
             device_name.setText(currentDevice.WDDevice.deviceName);
         }
-        Button joinGrp = view.findViewById(R.id.join_grp_button);
-        joinGrp.setTag(i);
+        Button connect = view.findViewById(R.id.connect_button);
+        connect.setTag(i);
         return view;
     }
 }

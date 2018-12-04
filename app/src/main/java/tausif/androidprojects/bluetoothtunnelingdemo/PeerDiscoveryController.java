@@ -8,7 +8,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -82,7 +81,6 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
     }
 
     void joinGrp(Device device) {
-        Log.d("inside", "join group");
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.WDDevice.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
@@ -90,9 +88,15 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
         wifiP2pManager.connect(channel, config, null);
     }
 
+    void connect(Device device) {
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.WDDevice.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+        wifiP2pManager.connect(channel, config, null);
+    }
+
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
-        Log.d("group", "formed");
         Constants.groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
         Constants.isGroupOwner = wifiP2pInfo.isGroupOwner;
         if (Constants.isGroupOwner)

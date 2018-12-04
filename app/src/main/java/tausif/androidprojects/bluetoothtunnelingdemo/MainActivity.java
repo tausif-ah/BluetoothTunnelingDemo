@@ -81,4 +81,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("device name", device.WDDevice.deviceName);
         peerDiscoveryController.joinGrp(device);
     }
+
+    public void connectButtonPressed(View view) {
+        int tag = (int)view.getTag();
+        Device device = devices.get(tag);
+        peerDiscoveryController.connect(device);
+    }
 }
