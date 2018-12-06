@@ -1,6 +1,8 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     DeviceListAdapter deviceListAdapter;
     PeerDiscoveryController peerDiscoveryController;
     WDUDPSender udpSender;
+    BTConnectedSocketManager btConnectedSocketManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setUpPermissions();
         setupDeviceList();
+        setUpBluetoothDataTransfer();
         Constants.isGroupOwner = false;
         initiateDeviceDiscovery();
     }
@@ -75,6 +80,35 @@ public class MainActivity extends AppCompatActivity {
         ListView deviceList = findViewById(R.id.device_list_view);
         deviceListAdapter = new DeviceListAdapter(this, devices);
         deviceList.setAdapter(deviceListAdapter);
+    }
+
+    private void setUpBluetoothDataTransfer() {
+        BTConnectionListener btConnectionListener = new BTConnectionListener(this);
+        btConnectionListener.start();
+    }
+
+    public void setUpBTConnection() {
+        BTSocketConnector socketConnector = new BTSocketConnector();
+        Device currentDevice = null;
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Constants.hostBluetoothName = bluetoothAdapter.getName();
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice pairedDevice: pairedDevices
+                    ) {
+                Device device = new Device(Constants.BLUETOOTH_DEVICE, null, pairedDevice);
+                currentDevice = device;
+                break;
+            }
+        }
+        socketConnector.setDevice(currentDevice);
+        BluetoothSocket connectedSocket = socketConnector.createSocket();
+        btConnectedSocketManager = null;
+        if (connectedSocket!=null) {
+            btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
+            btConnectedSocketManager.start();
+        }
+        btConnectedSocketManager.setDevice(currentDevice);
     }
 
     void initiateDeviceDiscovery() {
@@ -128,9 +162,8 @@ public class MainActivity extends AppCompatActivity {
                 ipMacSync();
         }
         else {
-//            showToast("bluetooth connection established");
-//            btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
-//            btConnectedSocketManager.start();
+            btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
+            btConnectedSocketManager.start();
         }
     }
 
@@ -170,7 +203,18 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (pktType == Constants.IP_MAC_SYNC_RET)
             matchIPToMac(srcAddr, splited[1]);
-        else if (pktType == Constants.HELLO)
+        else if (pktType == Constants.HELLO) {
+            showToast(splited[1]);
+            setUpBTConnection();
+            btConnectedSocketManager.sendPkt(splited[0]+"#"+splited[1]);
+        }
+    }
+
+    public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
+        final String receivedPkt = new String(readBuffer);
+        String splited[] = receivedPkt.split("#");
+        int pktType = Integer.parseInt(splited[0]);
+        if (pktType == Constants.HELLO)
             showToast(splited[1]);
     }
 
