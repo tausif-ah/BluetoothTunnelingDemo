@@ -40,8 +40,8 @@ public class DeviceListAdapter extends BaseAdapter {
         Device currentDevice = devices.get(i);
         view = inflater.inflate(R.layout.device_list_row, viewGroup, false);
         TextView device_name = view.findViewById(R.id.device_name_textview);
-        if (currentDevice.deviceType == Constants.WD_DEVICE) {
-            device_name.setText(currentDevice.WDDevice.deviceName);
+        if (currentDevice.deviceType == Constants.WIFI_DEVICE) {
+            device_name.setText(currentDevice.wifiDevice.deviceName);
         }
         Button connect = view.findViewById(R.id.connect_button);
         connect.setTag(i);

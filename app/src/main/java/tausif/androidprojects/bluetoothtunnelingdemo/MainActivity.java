@@ -1,21 +1,32 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
+import android.Manifest;
+import android.bluetooth.BluetoothSocket;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Device> devices;
     DeviceListAdapter deviceListAdapter;
     PeerDiscoveryController peerDiscoveryController;
+    WDUDPSender udpSender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setUpPermissions();
         setupDeviceList();
+        Constants.isGroupOwner = false;
         initiateDeviceDiscovery();
     }
 
@@ -47,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setUpPermissions() {
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
+        }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, Constants.REQUEST_CODE_LOCATION);
     }
 
     void setupDeviceList() {
@@ -78,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     public void joinGrpButtonPressed(View view) {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
-        Log.d("device name", device.WDDevice.deviceName);
+        Log.d("device name", device.wifiDevice.deviceName);
         peerDiscoveryController.joinGrp(device);
     }
 
@@ -86,5 +107,79 @@ public class MainActivity extends AppCompatActivity {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
         peerDiscoveryController.connect(device);
+    }
+
+    public void sendButtonPressed(View view) {
+        if (!Constants.isGroupOwner) {
+            String pkt = PacketManager.createHelloForGrpOwner(Constants.HELLO);
+            udpSender = null;
+            udpSender = new WDUDPSender();
+            udpSender.createPkt(pkt, Constants.groupOwnerAddress);
+            udpSender.setRunLoop(false);
+            udpSender.start();
+        }
+    }
+
+    public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
+        if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
+            WDUDPListener udpListener = new WDUDPListener(this);
+            udpListener.start();
+            if (!Constants.isGroupOwner)
+                ipMacSync();
+        }
+        else {
+//            showToast("bluetooth connection established");
+//            btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
+//            btConnectedSocketManager.start();
+        }
+    }
+
+    public void ipMacSync() {
+        String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC, Constants.hostWifiAddress);
+        udpSender = null;
+        udpSender = new WDUDPSender();
+        udpSender.createPkt(pkt, Constants.groupOwnerAddress);
+        udpSender.setRunLoop(false);
+        udpSender.start();
+    }
+
+    public void matchIPToMac(InetAddress ipAddr, String macAddr) {
+        for (Device device:devices
+                ) {
+            if (device.deviceType == Constants.WIFI_DEVICE) {
+                if (device.wifiDevice.deviceAddress.equals(macAddr)){
+                    device.IPAddress = ipAddr;
+                    showToast("ip mac synced");
+                    break;
+                }
+            }
+        }
+    }
+
+    public void processReceivedWiFiPkt(InetAddress srcAddr, long receivingTime, String receivedPkt) {
+        String splited[] = receivedPkt.split("#");
+        int pktType = Integer.parseInt(splited[0]);
+        if (pktType == Constants.IP_MAC_SYNC) {
+            String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC_RET, Constants.hostWifiAddress);
+            udpSender = null;
+            udpSender = new WDUDPSender();
+            udpSender.createPkt(pkt, srcAddr);
+            udpSender.setRunLoop(false);
+            udpSender.start();
+            matchIPToMac(srcAddr, splited[1]);
+        }
+        else if (pktType == Constants.IP_MAC_SYNC_RET)
+            matchIPToMac(srcAddr, splited[1]);
+        else if (pktType == Constants.HELLO)
+            showToast(splited[1]);
+    }
+
+    public void showToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

@@ -54,7 +54,7 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
             wifiDevices.clear();
         for (WifiP2pDevice device: deviceList.getDeviceList()
                 ) {
-            Device newDevice = new Device(Constants.WD_DEVICE, null, device);
+            Device newDevice = new Device(Constants.WIFI_DEVICE, device, null);
             wifiDevices.add(newDevice);
         }
     }
@@ -82,7 +82,7 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
 
     void joinGrp(Device device) {
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = device.WDDevice.deviceAddress;
+        config.deviceAddress = device.wifiDevice.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
         config.groupOwnerIntent = 0;
         wifiP2pManager.connect(channel, config, null);
@@ -90,7 +90,7 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
 
     void connect(Device device) {
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = device.WDDevice.deviceAddress;
+        config.deviceAddress = device.wifiDevice.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
         wifiP2pManager.connect(channel, config, null);
     }
@@ -100,8 +100,9 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
         Constants.groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
         Constants.isGroupOwner = wifiP2pInfo.isGroupOwner;
         if (Constants.isGroupOwner)
-            Toast.makeText(context, "group owner", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "wifi direct group owner", Toast.LENGTH_LONG).show();
         else
-            Toast.makeText(context, "client", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "wifi direct client", Toast.LENGTH_LONG).show();
+        mainActivity.connectionEstablished(Constants.WIFI_DIRECT_CONNECTION, null);
     }
 }
