@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendButtonPressed(View view) {
         if (!Constants.isGroupOwner) {
-            String pkt = PacketManager.createServerReqMsg(Constants.SERVER_REQ);
+            String pkt = PacketManager.createServerRequest(Constants.SERVER_REQ);
             udpSender = null;
             udpSender = new WDUDPSender();
             udpSender.createPkt(pkt, Constants.groupOwnerAddress);
@@ -209,8 +209,23 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 showToast(splited[1]);
+//                String pkt = PacketManager.createServerResponse(Constants.SERVER_RES);
+//                udpSender = null;
+//                udpSender = new WDUDPSender();
+//                udpSender.createPkt(pkt, Constants.groupOwnerAddress);
+//                udpSender.setRunLoop(false);
+//                udpSender.start();
             }
         }
+//        else if (pktType == Constants.SERVER_RES) {
+//            if (Constants.isGroupOwner) {
+//                showToast(splited[1]);
+//                btConnectedSocketManager.sendPkt(pktCpy);
+//            }
+//            else {
+//                showToast(splited[1]);
+//            }
+//        }
     }
 
     public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
@@ -231,6 +246,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+//        else if (pktType == Constants.SERVER_RES) {
+//            showToast(splited[1]);
+//            for (Device device: devices
+//                    ) {
+//                if (device.wifiDevice.deviceName.equals("NWSL 4")) {
+//                    udpSender = null;
+//                    udpSender = new WDUDPSender();
+//                    udpSender.createPkt(pktCpy, device.IPAddress);
+//                    udpSender.setRunLoop(false);
+//                    udpSender.start();
+//                }
+//            }
+//        }
     }
 
     public void showToast(final String message) {

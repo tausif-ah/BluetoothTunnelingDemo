@@ -20,6 +20,7 @@ class Constants {
     static final int IP_MAC_SYNC = 104;
     static final int IP_MAC_SYNC_RET = 105;
     static final int SERVER_REQ = 106;
+    static final int SERVER_RES = 107;
     static final String serverName = "NWSL 8";
 
     static final int WIFI_DIRECT_CONNECTION = 1000;
