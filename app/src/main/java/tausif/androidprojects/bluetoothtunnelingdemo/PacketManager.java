@@ -5,8 +5,8 @@ public class PacketManager {
         return (String.valueOf(pktType) + "#" + macAddr + "#");
     }
 
-    public static String createHelloForGrpOwner(int pktType) {
-        String pkt = String.valueOf(pktType) + "#" + "Hello from " + Constants.hostWifiName;
+    public static String createServerReqMsg(int pktType) {
+        String pkt = String.valueOf(pktType) + "#" + "Request from " + Constants.hostWifiName;
         return pkt;
     }
 }

@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -145,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendButtonPressed(View view) {
         if (!Constants.isGroupOwner) {
-            String pkt = PacketManager.createHelloForGrpOwner(Constants.HELLO);
+            String pkt = PacketManager.createServerReqMsg(Constants.SERVER_REQ);
             udpSender = null;
             udpSender = new WDUDPSender();
             udpSender.createPkt(pkt, Constants.groupOwnerAddress);
@@ -190,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void processReceivedWiFiPkt(InetAddress srcAddr, long receivingTime, String receivedPkt) {
+        String pktCpy = receivedPkt;
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
         if (pktType == Constants.IP_MAC_SYNC) {
@@ -203,19 +201,36 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (pktType == Constants.IP_MAC_SYNC_RET)
             matchIPToMac(srcAddr, splited[1]);
-        else if (pktType == Constants.HELLO) {
-            showToast(splited[1]);
-            setUpBTConnection();
-            btConnectedSocketManager.sendPkt(splited[0]+"#"+splited[1]);
+        else if (pktType == Constants.SERVER_REQ) {
+            if (Constants.isGroupOwner) {
+                showToast(splited[1]);
+                setUpBTConnection();
+                btConnectedSocketManager.sendPkt(pktCpy);
+            }
+            else {
+                showToast(splited[1]);
+            }
         }
     }
 
     public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
         final String receivedPkt = new String(readBuffer);
+        String pktCpy = receivedPkt;
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
-        if (pktType == Constants.HELLO)
+        if (pktType == Constants.SERVER_REQ) {
             showToast(splited[1]);
+            for (Device device: devices
+                 ) {
+                if (device.wifiDevice.deviceName.equals(Constants.serverName)) {
+                    udpSender = null;
+                    udpSender = new WDUDPSender();
+                    udpSender.createPkt(pktCpy, device.IPAddress);
+                    udpSender.setRunLoop(false);
+                    udpSender.start();
+                }
+            }
+        }
     }
 
     public void showToast(final String message) {
