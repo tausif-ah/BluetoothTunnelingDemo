@@ -66,28 +66,6 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
         }
     }
 
-    void createGrp() {
-        wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(context, "Group created", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int i) {
-                Toast.makeText(context, "Group creation failed", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    void joinGrp(Device device) {
-        WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = device.wifiDevice.deviceAddress;
-        config.wps.setup = WpsInfo.PBC;
-        config.groupOwnerIntent = 0;
-        wifiP2pManager.connect(channel, config, null);
-    }
-
     void connect(Device device) {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.wifiDevice.deviceAddress;

@@ -123,17 +123,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void crtGrpButtonPressed(View view) {
-        peerDiscoveryController.createGrp();
-    }
-
-    public void joinGrpButtonPressed(View view) {
-        int tag = (int)view.getTag();
-        Device device = devices.get(tag);
-        Log.d("device name", device.wifiDevice.deviceName);
-        peerDiscoveryController.joinGrp(device);
-    }
-
     public void connectButtonPressed(View view) {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
