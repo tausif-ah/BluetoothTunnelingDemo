@@ -7,12 +7,14 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.widget.EditText;
 
 public class PeerDiscoveryBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
     private PeerDiscoveryController peerDiscoveryController;
+    private MainActivity mainActivity;
 
     public void setWifiP2pManager(WifiP2pManager wifiP2pManager) {
         this.wifiP2pManager = wifiP2pManager;
@@ -26,6 +28,10 @@ public class PeerDiscoveryBroadcastReceiver extends BroadcastReceiver {
         this.peerDiscoveryController = peerDiscoveryController;
     }
 
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -33,6 +39,7 @@ public class PeerDiscoveryBroadcastReceiver extends BroadcastReceiver {
             WifiP2pDevice hostDevice = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
             Constants.hostWifiAddress = hostDevice.deviceAddress;
             Constants.hostWifiName = hostDevice.deviceName;
+            mainActivity.deviceNameAvailable();
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {

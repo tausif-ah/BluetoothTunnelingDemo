@@ -10,7 +10,8 @@ class Constants {
     static String hostWifiAddress = "";
     static InetAddress groupOwnerAddress;
     static boolean isGroupOwner;
-    static final int WI_FI_DIRECT_UDP_LISTENING_PORT = 8383;
+    static final int WD_UDP_LISTENING_PORT = 8383;
+    static final int WD_WEB_SERVER_LISTENING_PORT = 8500;
 
     static final int BLUETOOTH_DEVICE = 0;
     static final int WIFI_DEVICE = 1;

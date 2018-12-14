@@ -14,10 +14,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     PeerDiscoveryController peerDiscoveryController;
     WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
+    ArrayList<Connection> connections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +127,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void deviceNameAvailable() {
+        final TextView deviceName = findViewById(R.id.device_name_textview);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                deviceName.setText(Constants.hostWifiName);
+            }
+        });
+    }
+
     public void connectButtonPressed(View view) {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
@@ -142,10 +156,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
+            final TextView groupRole = findViewById(R.id.group_role_textview);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String groupRoleText = "Client";
+                    if (Constants.isGroupOwner)
+                        groupRoleText = "Group owner";
+                    groupRole.setText(groupRoleText);
+                }
+            });
             WDUDPListener udpListener = new WDUDPListener(this);
             udpListener.start();
-            if (!Constants.isGroupOwner)
+            if (!Constants.isGroupOwner) {
                 ipMacSync();
+            }
         }
         else {
             btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
