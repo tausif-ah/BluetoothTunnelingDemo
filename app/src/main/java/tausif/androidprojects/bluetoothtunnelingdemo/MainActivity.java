@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
     ArrayList<Connection> connections;
+    boolean willUpdateDeviceList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setupDeviceList();
         setUpBluetoothDataTransfer();
         Constants.isGroupOwner = false;
+        willUpdateDeviceList = true;
         initiateDeviceDiscovery();
     }
 
@@ -117,14 +119,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void discoveryFinished(ArrayList<Device> WDDevices) {
-        devices.clear();
-        devices.addAll(WDDevices);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                deviceListAdapter.notifyDataSetChanged();
-            }
-        });
+        if (willUpdateDeviceList) {
+            devices.clear();
+            devices.addAll(WDDevices);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    deviceListAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     public void deviceNameAvailable() {
@@ -193,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
             if (device.deviceType == Constants.WIFI_DEVICE) {
                 if (device.wifiDevice.deviceAddress.equals(macAddr)){
                     device.IPAddress = ipAddr;
+                    willUpdateDeviceList = false;
                     showToast("ip mac synced");
                     break;
                 }
@@ -221,58 +226,34 @@ public class MainActivity extends AppCompatActivity {
                 setUpBTConnection();
                 btConnectedSocketManager.sendPkt(pktCpy);
             }
-            else {
+            else
                 showToast(splited[1]);
-//                String pkt = PacketManager.createServerResponse(Constants.SERVER_RES);
-//                udpSender = null;
-//                udpSender = new WDUDPSender();
-//                udpSender.createPkt(pkt, Constants.groupOwnerAddress);
-//                udpSender.setRunLoop(false);
-//                udpSender.start();
-            }
         }
-//        else if (pktType == Constants.SERVER_RES) {
-//            if (Constants.isGroupOwner) {
-//                showToast(splited[1]);
-//                btConnectedSocketManager.sendPkt(pktCpy);
-//            }
-//            else {
-//                showToast(splited[1]);
-//            }
-//        }
     }
 
     public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
         final String receivedPkt = new String(readBuffer);
+        Log.d("received", receivedPkt);
         String pktCpy = receivedPkt;
         String splited[] = receivedPkt.split("#");
+        Log.d("copy", pktCpy);
         int pktType = Integer.parseInt(splited[0]);
         if (pktType == Constants.SERVER_REQ) {
             showToast(splited[1]);
             for (Device device: devices
                  ) {
                 if (device.wifiDevice.deviceName.equals(Constants.serverName)) {
+                    Log.d("device name",device.wifiDevice.deviceName);
+                    Log.d("ip",device.IPAddress.getHostAddress());
                     udpSender = null;
                     udpSender = new WDUDPSender();
                     udpSender.createPkt(pktCpy, device.IPAddress);
                     udpSender.setRunLoop(false);
                     udpSender.start();
+                    break;
                 }
             }
         }
-//        else if (pktType == Constants.SERVER_RES) {
-//            showToast(splited[1]);
-//            for (Device device: devices
-//                    ) {
-//                if (device.wifiDevice.deviceName.equals("NWSL 4")) {
-//                    udpSender = null;
-//                    udpSender = new WDUDPSender();
-//                    udpSender.createPkt(pktCpy, device.IPAddress);
-//                    udpSender.setRunLoop(false);
-//                    udpSender.start();
-//                }
-//            }
-//        }
     }
 
     public void showToast(final String message) {
