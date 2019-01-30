@@ -99,9 +99,7 @@ public class MainActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice pairedDevice: pairedDevices
                     ) {
-                Device device = new Device(Constants.BLUETOOTH_DEVICE, null, pairedDevice);
-                currentDevice = device;
-                break;
+                currentDevice = new Device(Constants.BLUETOOTH_DEVICE, null, pairedDevice);
             }
         }
         socketConnector.setDevice(currentDevice);
