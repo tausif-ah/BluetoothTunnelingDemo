@@ -168,6 +168,14 @@ public class MainActivity extends AppCompatActivity {
                     groupRole.setText(groupRoleText);
                 }
             });
+            if (Constants.isGroupOwner) {
+                WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT);
+                webServerListener.start();
+            }
+            else {
+                WebServerConnector webServerConnector = new WebServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
+                webServerConnector.start();
+            }
             WDUDPListener udpListener = new WDUDPListener(this);
             udpListener.start();
             if (!Constants.isGroupOwner) {
@@ -208,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
         if (pktType == Constants.IP_MAC_SYNC) {
+            Log.d("src addr UDP", srcAddr.getHostAddress());
             String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC_RET, Constants.hostWifiAddress);
             udpSender = null;
             udpSender = new WDUDPSender();
