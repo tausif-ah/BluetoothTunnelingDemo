@@ -123,32 +123,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void crtGrpButtonPressed(View view) {
-        peerDiscoveryController.createGrp();
-    }
-
-    public void joinGrpButtonPressed(View view) {
-        int tag = (int)view.getTag();
-        Device device = devices.get(tag);
-        Log.d("device name", device.wifiDevice.deviceName);
-        peerDiscoveryController.joinGrp(device);
-    }
-
     public void connectButtonPressed(View view) {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
         peerDiscoveryController.connect(device);
-    }
-
-    public void sendButtonPressed(View view) {
-        if (!Constants.isGroupOwner) {
-            String pkt = PacketManager.createHelloForGrpOwner(Constants.HELLO);
-            udpSender = null;
-            udpSender = new WDUDPSender();
-            udpSender.createPkt(pkt, Constants.groupOwnerAddress);
-            udpSender.setRunLoop(false);
-            udpSender.start();
-        }
     }
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
@@ -200,19 +178,12 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (pktType == Constants.IP_MAC_SYNC_RET)
             matchIPToMac(srcAddr, splited[1]);
-        else if (pktType == Constants.HELLO) {
-            showToast(splited[1]);
-            setUpBTConnection();
-            btConnectedSocketManager.sendPkt(splited[0]+"#"+splited[1]);
-        }
     }
 
     public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
         final String receivedPkt = new String(readBuffer);
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
-        if (pktType == Constants.HELLO)
-            showToast(splited[1]);
     }
 
     public void showToast(final String message) {

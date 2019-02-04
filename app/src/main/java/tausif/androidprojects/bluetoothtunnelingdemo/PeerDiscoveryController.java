@@ -30,7 +30,6 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
         this.mainActivity = mainActivity;
         peerDiscoveryBroadcastReceiver = new PeerDiscoveryBroadcastReceiver();
         peerDiscoveryBroadcastReceiver.setPeerDiscoveryController(this);
-        peerDiscoveryBroadcastReceiver.setMainActivity(this.mainActivity);
         intentFilter = new IntentFilter();
         configureWiFiDiscovery();
         context.registerReceiver(peerDiscoveryBroadcastReceiver, intentFilter);
