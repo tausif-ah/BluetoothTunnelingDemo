@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -91,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         BTSocketConnector socketConnector = new BTSocketConnector();
         Device currentDevice = null;
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        Constants.hostBluetoothName = bluetoothAdapter.getName();
+        Constants.selfBluetoothName = bluetoothAdapter.getName();
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice pairedDevice: pairedDevices
@@ -168,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ipMacSync() {
-        String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC, Constants.hostWifiAddress);
+        String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC, Constants.selfWifiAddress);
         udpSender = null;
         udpSender = new WDUDPSender();
         udpSender.createPkt(pkt, Constants.groupOwnerAddress);
@@ -193,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
         if (pktType == Constants.IP_MAC_SYNC) {
-            String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC_RET, Constants.hostWifiAddress);
+            String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC_RET, Constants.selfWifiAddress);
             udpSender = null;
             udpSender = new WDUDPSender();
             udpSender.createPkt(pkt, srcAddr);

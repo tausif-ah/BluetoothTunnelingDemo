@@ -3,11 +3,11 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 import java.net.InetAddress;
 
 class Constants {
-    static String hostBluetoothName = "";
+    static String selfBluetoothName = "";
     static final String MY_UUID = "e439084f-b7f1-460c-8a3f-d4cc883413e2";
 
-    static String hostWifiName = "";
-    static String hostWifiAddress = "";
+    static String selfWifiName = "";
+    static String selfWifiAddress = "";
     static InetAddress groupOwnerAddress;
     static boolean isGroupOwner;
     static final int WI_FI_DIRECT_UDP_LISTENING_PORT = 8383;
