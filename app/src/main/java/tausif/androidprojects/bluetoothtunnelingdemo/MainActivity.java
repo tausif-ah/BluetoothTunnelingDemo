@@ -133,8 +133,13 @@ public class MainActivity extends AppCompatActivity {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
             WDUDPListener udpListener = new WDUDPListener(this);
             udpListener.start();
-            if (!Constants.isGroupOwner)
-                ipMacSync();
+            if (Constants.isGroupOwner) {
+                WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT);
+                webServerListener.start();
+            }
+            else {
+//                ipMacSync();
+            }
         }
         else {
             btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);

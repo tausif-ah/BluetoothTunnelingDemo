@@ -3,6 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="crtGrp">create group</string>
     <string name="joinGrp">join group</string>
-    <string name="connect">connect</string>
-    <string name="send">send</string>
+    <string name="connect">connect to master</string>
+    <string name="send">send message to web server</string>
 </resources>
