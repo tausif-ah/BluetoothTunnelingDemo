@@ -26,7 +26,6 @@
         android:layout_weight="1"
         android:id="@+id/send_button"
         android:background="@android:color/holo_green_light"
-        android:text="@string/send"
-        android:onClick="sendButtonPressed"/>
+        android:text="@string/send" />
 
 </LinearLayout>
