@@ -1,12 +1,13 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
+import android.util.Log;
+
 import java.net.InetAddress;
 import java.net.Socket;
 
 public class WebServerConnector extends Thread {
     private InetAddress serverAddr;
     private int serverPort;
-    private Socket clientSocket;
 
     WebServerConnector(InetAddress serverAddr, int serverPort) {
         this.serverAddr = serverAddr;
@@ -16,10 +17,10 @@ public class WebServerConnector extends Thread {
     @Override
     public void run() {
         try {
-            clientSocket = new Socket(serverAddr,serverPort);
-            clientSocket.setKeepAlive(true);
+            Socket socketToServer = new Socket(serverAddr,serverPort);
+            socketToServer.setKeepAlive(true);
         } catch (Exception ex) {
-
+            Log.e("server socket creation", ex.getMessage());
         }
     }
 }

@@ -9,11 +9,12 @@
     tools:showIn="@layout/activity_main">
 
     <TextView
+        android:id="@+id/device_name_textview"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:id="@+id/device_name_textview"
+        android:background="@android:color/holo_purple"
         android:gravity="center"
-        android:background="@android:color/holo_purple"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="match_parent"

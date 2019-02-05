@@ -15,19 +15,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Device> devices;
+    ArrayList<WDClient> WDClients;
     DeviceListAdapter deviceListAdapter;
     PeerDiscoveryController peerDiscoveryController;
     WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
+    boolean webServerListnerRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setUpBluetoothDataTransfer();
         Constants.isGroupOwner = false;
         initiateDeviceDiscovery();
+        webServerListnerRunning = false;
     }
 
     @Override
@@ -131,14 +136,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
-            WDUDPListener udpListener = new WDUDPListener(this);
-            udpListener.start();
+//            WDUDPListener udpListener = new WDUDPListener(this);
+//            udpListener.start();
             if (Constants.isGroupOwner) {
-                WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT);
-                webServerListener.start();
+                WDClients = new ArrayList<>();
+                if (!webServerListnerRunning) {
+                    showGroupRole("Group owner");
+                    WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
+                    webServerListener.start();
+                    webServerListnerRunning = true;
+                }
             }
             else {
+                showGroupRole("Group client");
 //                ipMacSync();
+                WebServerConnector webServerConnector = new WebServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
+                webServerConnector.start();
             }
         }
         else {
@@ -169,6 +182,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void clientSocketCreated(Socket clientSocket) {
+        InetAddress srcAddr = clientSocket.getInetAddress();
+        int srcPort = clientSocket.getPort();
+        WDClient client = new WDClient(srcAddr, srcPort, clientSocket);
+        WDClients.add(client);
+        showWDClients();
+    }
+
     public void processReceivedWiFiPkt(InetAddress srcAddr, long receivingTime, String receivedPkt) {
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
@@ -191,6 +212,16 @@ public class MainActivity extends AppCompatActivity {
         int pktType = Integer.parseInt(splited[0]);
     }
 
+    public void showGroupRole(final String groupRoleText) {
+        final TextView groupRole = findViewById(R.id.group_role_textview);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                groupRole.setText(groupRoleText);
+            }
+        });
+    }
+
     public void showToast(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -198,5 +229,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void showWDClients() {
+        Log.e("number of clients", String.valueOf(WDClients.size()));
+        for (int i=0; i<WDClients.size(); i++) {
+            WDClient client = WDClients.get(i);
+            Log.d("client no", String.valueOf(i+1));
+            Log.d("ip address", client.IPAddr.getHostAddress());
+            Log.d("port no", String.valueOf(client.port));
+        }
     }
 }

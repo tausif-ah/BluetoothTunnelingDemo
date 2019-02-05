@@ -2,21 +2,19 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 
 import android.util.Log;
 
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class WebServerListener extends Thread {
-    private int listeningPort;
     private ServerSocket serverSocket;
-    private Socket clientSocket;
+    private MainActivity mainActivity;
 
-    WebServerListener(int listeningPort) {
-        this.listeningPort = listeningPort;
+    WebServerListener(int listeningPort, MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
         try {
-            serverSocket = new ServerSocket(this.listeningPort);
+            serverSocket = new ServerSocket(listeningPort);
         } catch (Exception ex) {
-
+            Log.e("server socket creation", ex.getMessage());
         }
 
     }
@@ -25,14 +23,11 @@ public class WebServerListener extends Thread {
     public void run() {
         while (true) {
             try {
-                clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
                 clientSocket.setKeepAlive(true);
-                InetAddress srcAddr = clientSocket.getInetAddress();
-                int srcPort = clientSocket.getPort();
-                Log.d("src address TCP", srcAddr.getHostAddress());
-                Log.d("src port", Integer.toString(srcPort));
+                mainActivity.clientSocketCreated(clientSocket);
             } catch (Exception ex) {
-
+                Log.e("listening for client", ex.getMessage());
             }
         }
     }
