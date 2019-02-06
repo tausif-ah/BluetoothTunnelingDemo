@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     PeerDiscoveryController peerDiscoveryController;
     WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
-    boolean webServerListnerRunning;
+    boolean WDgroupFormed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setUpBluetoothDataTransfer();
         Constants.isGroupOwner = false;
         initiateDeviceDiscovery();
-        webServerListnerRunning = false;
+        WDgroupFormed = false;
     }
 
     @Override
@@ -136,20 +136,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
-//            WDUDPListener udpListener = new WDUDPListener(this);
-//            udpListener.start();
             if (Constants.isGroupOwner) {
-                WDClients = new ArrayList<>();
-                if (!webServerListnerRunning) {
+                if (!WDgroupFormed) {
                     showGroupRole("Group owner");
+                    WDClients = new ArrayList<>();
                     WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
                     webServerListener.start();
-                    webServerListnerRunning = true;
+                    WDgroupFormed = true;
                 }
             }
             else {
                 showGroupRole("Group client");
-//                ipMacSync();
                 WebServerConnector webServerConnector = new WebServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
                 webServerConnector.start();
             }
@@ -232,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showWDClients() {
-        Log.e("number of clients", String.valueOf(WDClients.size()));
+        Log.d("number of clients", String.valueOf(WDClients.size()));
         for (int i=0; i<WDClients.size(); i++) {
             WDClient client = WDClients.get(i);
             Log.d("client no", String.valueOf(i+1));
