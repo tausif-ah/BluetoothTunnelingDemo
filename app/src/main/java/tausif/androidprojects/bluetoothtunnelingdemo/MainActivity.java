@@ -26,7 +26,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Device> devices;
-    ArrayList<WDClient> WDClients;
+    ArrayList<WDConnection> WDConnections;
     DeviceListAdapter deviceListAdapter;
     PeerDiscoveryController peerDiscoveryController;
     WDUDPSender udpSender;
@@ -139,16 +139,16 @@ public class MainActivity extends AppCompatActivity {
             if (Constants.isGroupOwner) {
                 if (!WDgroupFormed) {
                     showGroupRole("Group owner");
-                    WDClients = new ArrayList<>();
-                    WebServerListener webServerListener = new WebServerListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
-                    webServerListener.start();
+                    WDConnections = new ArrayList<>();
+                    ServerConnectionListener serverConnectionListener = new ServerConnectionListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
+                    serverConnectionListener.start();
                     WDgroupFormed = true;
                 }
             }
             else {
                 showGroupRole("Group client");
-                WebServerConnector webServerConnector = new WebServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
-                webServerConnector.start();
+                ServerConnector serverConnector = new ServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
+                serverConnector.start();
             }
         }
         else {
@@ -182,8 +182,8 @@ public class MainActivity extends AppCompatActivity {
     public void clientSocketCreated(Socket clientSocket) {
         InetAddress srcAddr = clientSocket.getInetAddress();
         int srcPort = clientSocket.getPort();
-        WDClient client = new WDClient(srcAddr, srcPort, clientSocket);
-        WDClients.add(client);
+        WDConnection client = new WDConnection(srcAddr, srcPort, clientSocket);
+        WDConnections.add(client);
         showWDClients();
     }
 
@@ -229,9 +229,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showWDClients() {
-        Log.d("number of clients", String.valueOf(WDClients.size()));
-        for (int i=0; i<WDClients.size(); i++) {
-            WDClient client = WDClients.get(i);
+        Log.d("number of clients", String.valueOf(WDConnections.size()));
+        for (int i = 0; i< WDConnections.size(); i++) {
+            WDConnection client = WDConnections.get(i);
             Log.d("client no", String.valueOf(i+1));
             Log.d("ip address", client.IPAddr.getHostAddress());
             Log.d("port no", String.valueOf(client.port));

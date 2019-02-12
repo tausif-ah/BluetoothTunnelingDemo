@@ -5,11 +5,11 @@ import android.util.Log;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class WebServerListener extends Thread {
+public class ServerConnectionListener extends Thread {
     private ServerSocket serverSocket;
     private MainActivity mainActivity;
 
-    WebServerListener(int listeningPort, MainActivity mainActivity) {
+    ServerConnectionListener(int listeningPort, MainActivity mainActivity) {
         this.mainActivity = mainActivity;
         try {
             serverSocket = new ServerSocket(listeningPort);

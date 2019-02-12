@@ -5,11 +5,11 @@ import android.util.Log;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class WebServerConnector extends Thread {
+public class ServerConnector extends Thread {
     private InetAddress serverAddr;
     private int serverPort;
 
-    WebServerConnector(InetAddress serverAddr, int serverPort) {
+    ServerConnector(InetAddress serverAddr, int serverPort) {
         this.serverAddr = serverAddr;
         this.serverPort = serverPort;
     }
