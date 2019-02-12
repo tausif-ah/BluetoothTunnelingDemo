@@ -136,10 +136,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
+            WDConnections = new ArrayList<>();
             if (Constants.isGroupOwner) {
                 if (!WDgroupFormed) {
                     showGroupRole("Group owner");
-                    WDConnections = new ArrayList<>();
                     ServerConnectionListener serverConnectionListener = new ServerConnectionListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
                     serverConnectionListener.start();
                     WDgroupFormed = true;
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 showGroupRole("Group client");
-                ServerConnector serverConnector = new ServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT);
+                ServerConnector serverConnector = new ServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT, this);
                 serverConnector.start();
             }
         }
@@ -179,12 +179,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void clientSocketCreated(Socket clientSocket) {
-        InetAddress srcAddr = clientSocket.getInetAddress();
-        int srcPort = clientSocket.getPort();
-        WDConnection client = new WDConnection(srcAddr, srcPort, clientSocket);
-        WDConnections.add(client);
-        showWDClients();
+    public void WDSocketCreated(Socket socket) {
+        WDConnection client;
+        if (Constants.isGroupOwner) {
+            InetAddress srcAddr = socket.getInetAddress();
+            int srcPort = socket.getPort();
+            client = new WDConnection(srcAddr, srcPort, socket);
+            WDConnections.add(client);
+            showWDConnections();
+        }
+        else {
+            client = new WDConnection(Constants.groupOwnerAddress, socket, true);
+            WDConnections.add(client);
+            showWDConnections();
+        }
     }
 
     public void processReceivedWiFiPkt(InetAddress srcAddr, long receivingTime, String receivedPkt) {
@@ -228,11 +236,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showWDClients() {
-        Log.d("number of clients", String.valueOf(WDConnections.size()));
+    public void showWDConnections() {
+        Log.d("number of connections", String.valueOf(WDConnections.size()));
         for (int i = 0; i< WDConnections.size(); i++) {
             WDConnection client = WDConnections.get(i);
-            Log.d("client no", String.valueOf(i+1));
+            Log.d("connection no", String.valueOf(i+1));
             Log.d("ip address", client.IPAddr.getHostAddress());
             Log.d("port no", String.valueOf(client.port));
         }

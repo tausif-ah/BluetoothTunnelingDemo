@@ -25,7 +25,7 @@ public class ServerConnectionListener extends Thread {
             try {
                 Socket clientSocket = serverSocket.accept();
                 clientSocket.setKeepAlive(true);
-                mainActivity.clientSocketCreated(clientSocket);
+                mainActivity.WDSocketCreated(clientSocket);
             } catch (Exception ex) {
                 Log.e("listening for client", ex.getMessage());
             }
