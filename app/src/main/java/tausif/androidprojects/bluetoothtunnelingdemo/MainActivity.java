@@ -128,10 +128,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void connectButtonPressed(View view) {
+    public void connectPressed(View view) {
         int tag = (int)view.getTag();
         Device device = devices.get(tag);
         peerDiscoveryController.connect(device);
+    }
+
+    public void sendToServerPressed(View view) {
+        if (!Constants.isGroupOwner) {
+            WDTCPSender sender = new WDTCPSender();
+            String message = Constants.selfWifiName;
+            sender.setMessage(message);
+            Socket socket = null;
+            for (WDConnection client: WDConnections
+                 ) {
+                if (client.groupOwnerConnection) {
+                    socket = client.connectedSocket;
+                    break;
+                }
+            }
+            sender.setSocket(socket);
+            sender.start();
+        }
     }
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
@@ -185,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
             InetAddress srcAddr = socket.getInetAddress();
             int srcPort = socket.getPort();
             client = new WDConnection(srcAddr, srcPort, socket);
+            client.start();
             WDConnections.add(client);
             showWDConnections();
         }
