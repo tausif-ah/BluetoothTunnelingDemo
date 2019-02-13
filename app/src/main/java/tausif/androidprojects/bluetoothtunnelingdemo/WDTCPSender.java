@@ -1,17 +1,15 @@
 package tausif.androidprojects.bluetoothtunnelingdemo;
 
 import android.util.Log;
-
-import java.io.DataOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
 public class WDTCPSender extends Thread {
 
-    String message;
+    private String message;
     Socket socket;
 
-    public void setMessage(String message) {
+    void setMessage(String message) {
         this.message = message;
     }
 
