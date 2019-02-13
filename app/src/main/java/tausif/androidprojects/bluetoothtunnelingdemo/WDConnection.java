@@ -11,18 +11,21 @@ class WDConnection extends Thread {
     int port;
     boolean groupOwnerConnection;
     Socket connectedSocket;
+    private MainActivity mainActivity;
 
-    WDConnection(InetAddress ipAddr, int port, Socket connectedSocket) {
+    WDConnection(InetAddress ipAddr, int port, Socket connectedSocket, MainActivity mainActivity) {
         this.IPAddr = ipAddr;
         this.port = port;
         this.connectedSocket = connectedSocket;
         this.groupOwnerConnection = false;
+        this.mainActivity = mainActivity;
     }
 
-    WDConnection(InetAddress ipAddr, Socket connectedSocket, boolean groupOwnerConnection) {
+    WDConnection(InetAddress ipAddr, Socket connectedSocket, boolean groupOwnerConnection, MainActivity mainActivity) {
         this.IPAddr = ipAddr;
         this.connectedSocket = connectedSocket;
         this.groupOwnerConnection = groupOwnerConnection;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -34,7 +37,7 @@ class WDConnection extends Thread {
                 byte[] buffer = new byte[100];
                 while (dataInputStream.read(buffer) > 0) {
                     String message = new String(buffer);
-                    Log.d("message from", message);
+                    mainActivity.messageInServerChannel(message);
                 }
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());

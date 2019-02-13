@@ -202,15 +202,13 @@ public class MainActivity extends AppCompatActivity {
         if (Constants.isGroupOwner) {
             InetAddress srcAddr = socket.getInetAddress();
             int srcPort = socket.getPort();
-            client = new WDConnection(srcAddr, srcPort, socket);
+            client = new WDConnection(srcAddr, srcPort, socket, this);
             client.start();
             WDConnections.add(client);
-            showWDConnections();
         }
         else {
-            client = new WDConnection(Constants.groupOwnerAddress, socket, true);
+            client = new WDConnection(Constants.groupOwnerAddress, socket, true, this);
             WDConnections.add(client);
-            showWDConnections();
         }
     }
 
@@ -234,6 +232,14 @@ public class MainActivity extends AppCompatActivity {
         final String receivedPkt = new String(readBuffer);
         String splited[] = receivedPkt.split("#");
         int pktType = Integer.parseInt(splited[0]);
+    }
+
+    public void messageInServerChannel(String message) {
+        if (Constants.isGroupOwner) {
+            showToast(message);
+        } else {
+
+        }
     }
 
     public void showGroupRole(final String groupRoleText) {
