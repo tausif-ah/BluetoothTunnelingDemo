@@ -137,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
     public void sendToServerPressed(View view) {
         if (!Constants.isGroupOwner) {
             WDTCPSender sender = new WDTCPSender();
-            String message = Constants.selfWifiName;
-            sender.setMessage(message);
+            ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
+            sender.setMessage(request);
             Socket socket = null;
             for (WDConnection client: WDConnections
                  ) {
@@ -234,11 +234,11 @@ public class MainActivity extends AppCompatActivity {
         int pktType = Integer.parseInt(splited[0]);
     }
 
-    public void messageInServerChannel(String message) {
+    public void messageInServerChannel(ServerMessage message) {
         if (Constants.isGroupOwner) {
-            showToast(message);
-        } else {
-
+            Log.d("data", message.data);
+            Log.d("destination", String.valueOf(message.destPort));
+            Log.d("type", String.valueOf(message.type));
         }
     }
 
