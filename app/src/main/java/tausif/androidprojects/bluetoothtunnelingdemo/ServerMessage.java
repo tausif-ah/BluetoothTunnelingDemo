@@ -3,9 +3,9 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-public class ServerMessage implements Serializable {
+class ServerMessage implements Serializable {
     int type;
-    private InetAddress source;
+    InetAddress source;
     int destPort;
     String data;
 

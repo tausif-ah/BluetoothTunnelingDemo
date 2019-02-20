@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
     boolean WDgroupFormed;
+    ArrayList<ServerMessage> serverMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
             WDConnections = new ArrayList<>();
+            serverMessages = new ArrayList<>();
             if (Constants.isGroupOwner) {
                 if (!WDgroupFormed) {
                     showGroupRole("Group owner");
@@ -237,8 +239,10 @@ public class MainActivity extends AppCompatActivity {
     public void messageInServerChannel(ServerMessage message) {
         if (Constants.isGroupOwner) {
             Log.d("data", message.data);
+            Log.d("source", message.source.getHostAddress());
             Log.d("destination", String.valueOf(message.destPort));
             Log.d("type", String.valueOf(message.type));
+            serverMessages.add(message);
         }
     }
 

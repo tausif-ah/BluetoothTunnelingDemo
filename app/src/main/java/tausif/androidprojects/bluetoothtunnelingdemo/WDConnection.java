@@ -2,9 +2,6 @@ package tausif.androidprojects.bluetoothtunnelingdemo;
 
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -37,6 +34,7 @@ class WDConnection extends Thread {
             try {
                 ObjectInputStream ois = new ObjectInputStream(connectedSocket.getInputStream());
                 ServerMessage message = (ServerMessage)ois.readObject();
+                message.source = connectedSocket.getInetAddress();
                 mainActivity.messageInServerChannel(message);
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());
