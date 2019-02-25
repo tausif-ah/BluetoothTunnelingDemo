@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<WDConnection> WDConnections;
     DeviceListAdapter deviceListAdapter;
     PeerDiscoveryController peerDiscoveryController;
-    WDUDPSender udpSender;
     BTConnectedSocketManager btConnectedSocketManager;
     boolean WDgroupFormed;
     ArrayList<ServerMessage> serverMessages;
@@ -177,28 +176,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void ipMacSync() {
-        String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC, Constants.selfWifiAddress);
-        udpSender = null;
-        udpSender = new WDUDPSender();
-        udpSender.createPkt(pkt, Constants.groupOwnerAddress);
-        udpSender.setRunLoop(false);
-        udpSender.start();
-    }
-
-    public void matchIPToMac(InetAddress ipAddr, String macAddr) {
-        for (Device device:devices
-                ) {
-            if (device.deviceType == Constants.WIFI_DEVICE) {
-                if (device.wifiDevice.deviceAddress.equals(macAddr)){
-                    device.IPAddress = ipAddr;
-                    showToast("ip mac synced");
-                    break;
-                }
-            }
-        }
-    }
-
     public void WDSocketCreated(Socket socket) {
         WDConnection client;
         if (Constants.isGroupOwner) {
@@ -212,22 +189,6 @@ public class MainActivity extends AppCompatActivity {
             client = new WDConnection(Constants.groupOwnerAddress, socket, true, this);
             WDConnections.add(client);
         }
-    }
-
-    public void processReceivedWiFiPkt(InetAddress srcAddr, long receivingTime, String receivedPkt) {
-        String splited[] = receivedPkt.split("#");
-        int pktType = Integer.parseInt(splited[0]);
-        if (pktType == Constants.IP_MAC_SYNC) {
-            String pkt = PacketManager.createIpMacSyncPkt(Constants.IP_MAC_SYNC_RET, Constants.selfWifiAddress);
-            udpSender = null;
-            udpSender = new WDUDPSender();
-            udpSender.createPkt(pkt, srcAddr);
-            udpSender.setRunLoop(false);
-            udpSender.start();
-            matchIPToMac(srcAddr, splited[1]);
-        }
-        else if (pktType == Constants.IP_MAC_SYNC_RET)
-            matchIPToMac(srcAddr, splited[1]);
     }
 
     public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
