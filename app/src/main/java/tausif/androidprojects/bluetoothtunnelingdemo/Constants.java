@@ -10,16 +10,15 @@ class Constants {
     static String selfWifiAddress = "";
     static InetAddress groupOwnerAddress;
     static boolean isGroupOwner;
-    static final int WD_UDP_LISTENING_PORT = 8500;
+    static boolean isGroupFormed;
     static final int WD_WEB_SERVER_LISTENING_PORT = 8383;
+    static boolean isWebServer;
 
     static final int BLUETOOTH_DEVICE = 0;
     static final int WIFI_DEVICE = 1;
 
     static final int TIME_SLOT_LENGTH = 10;    // in seconds
 
-    static final int IP_MAC_SYNC = 104;
-    static final int IP_MAC_SYNC_RET = 105;
     static final int SERVER_REQUEST = 106;
     static final int SERVER_RESPONSE = 107;
 

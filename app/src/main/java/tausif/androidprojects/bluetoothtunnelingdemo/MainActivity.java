@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         setupDeviceList();
         setUpBluetoothDataTransfer();
         Constants.isGroupOwner = false;
+        Constants.isGroupFormed = false;
+        Constants.isWebServer = false;
         initiateDeviceDiscovery();
         WDgroupFormed = false;
     }
@@ -152,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void makeSelfServerPressed(View view) {
+        Constants.isWebServer = true;
+        updateRoleText();
+    }
+
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
             WDConnections = new ArrayList<>();
@@ -208,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showGroupRole(final String groupRoleText) {
-        final TextView groupRole = findViewById(R.id.group_role_textview);
+        final TextView groupRole = findViewById(R.id.role_textview);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -234,5 +241,29 @@ public class MainActivity extends AppCompatActivity {
             Log.d("ip address", client.IPAddr.getHostAddress());
             Log.d("port no", String.valueOf(client.port));
         }
+    }
+
+    public void updateRoleText() {
+        String roleText = "";
+        if (Constants.isGroupFormed) {
+            if (Constants.isGroupOwner)
+                roleText = "Group owner";
+            else
+                roleText = "Group client";
+        }
+        if (Constants.isWebServer) {
+            if (roleText.length() > 0)
+                roleText += "-Web server";
+            else
+                roleText += "Web server";
+        }
+        final String roleString = roleText;
+        final TextView roleView = findViewById(R.id.role_textview);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                roleView.setText(roleString);
+            }
+        });
     }
 }

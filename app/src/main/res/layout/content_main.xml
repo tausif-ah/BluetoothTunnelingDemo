@@ -19,17 +19,28 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:id="@+id/group_role_textview"
+        android:id="@+id/role_textview"
         android:background="@android:color/holo_purple"
         app:layout_constraintTop_toBottomOf="@id/device_name_textview"
         android:gravity="center"
         android:layout_marginTop="10dp"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:id="@+id/make_self_server_button"
+        android:background="@android:color/holo_green_light"
+        app:layout_constraintTop_toBottomOf="@+id/role_textview"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:onClick="makeSelfServerPressed"
+        android:text="@string/makeServer"/>
+
     <ListView
         android:id="@+id/device_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/group_role_textview"
+        app:layout_constraintTop_toBottomOf="@id/make_self_server_button"
         android:layout_marginTop="10dp"/>
 
 </android.support.constraint.ConstraintLayout>
