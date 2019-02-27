@@ -32,7 +32,7 @@ public class BTConnectedSocketManager extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 ServerMessage message = (ServerMessage)ois.readObject();
                 // Read from the InputStream.
-                homeActivity.processReceivedBTPkt(message);
+                homeActivity.BluetoothMessageReceived(message);
             } catch (Exception e) {
                 Log.d("disconnection error",e.getLocalizedMessage());
                 break;

@@ -7,11 +7,12 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 class WDConnection extends Thread {
-    private InetAddress IPAddr;
+    InetAddress IPAddr;
     private int port;
     boolean groupOwnerConnection;
     Socket connectedSocket;
     private MainActivity mainActivity;
+    boolean isWebServerConnection;
 
     WDConnection(InetAddress ipAddr, int port, Socket connectedSocket, MainActivity mainActivity) {
         this.IPAddr = ipAddr;
@@ -19,6 +20,7 @@ class WDConnection extends Thread {
         this.connectedSocket = connectedSocket;
         this.groupOwnerConnection = false;
         this.mainActivity = mainActivity;
+        this.isWebServerConnection = false;
     }
 
     WDConnection(InetAddress ipAddr, Socket connectedSocket, boolean groupOwnerConnection, MainActivity mainActivity) {
@@ -26,6 +28,7 @@ class WDConnection extends Thread {
         this.connectedSocket = connectedSocket;
         this.groupOwnerConnection = groupOwnerConnection;
         this.mainActivity = mainActivity;
+        this.isWebServerConnection = false;
     }
 
     @Override
@@ -35,6 +38,7 @@ class WDConnection extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(connectedSocket.getInputStream());
                 ServerMessage message = (ServerMessage)ois.readObject();
                 message.source = connectedSocket.getInetAddress();
+                this.IPAddr = message.source;
                 mainActivity.messageInServerChannel(message);
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());

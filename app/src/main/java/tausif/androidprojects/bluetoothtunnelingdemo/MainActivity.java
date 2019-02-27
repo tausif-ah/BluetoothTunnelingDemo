@@ -213,8 +213,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void processReceivedBTPkt(ServerMessage message) {
-        showToast(message.data);
+    public void BluetoothMessageReceived(ServerMessage message) {
+        int msgType = message.type;
+        if (msgType == Constants.SERVER_REQUEST) {
+            showToast("request from "+message.data);
+        }
     }
 
     public void messageInServerChannel(ServerMessage message) {
@@ -229,6 +232,24 @@ public class MainActivity extends AppCompatActivity {
             else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
                 Log.d("make self server", message.data);
                 serverMessages.add(message);
+                for (WDConnection connection: WDConnections
+                     ) {
+                    if (message.source == connection.IPAddr) {
+                        connection.isWebServerConnection = true;
+                        wdtcpSender = null;
+                        wdtcpSender = new WDTCPSender();
+                        ServerMessage SelfServerNotifierReceived = new ServerMessage(115, null, 0, Constants.selfWifiName);
+                        wdtcpSender.setMessage(SelfServerNotifierReceived);
+                        Socket socket = null;
+                        socket = connection.connectedSocket;
+                        wdtcpSender.setSocket(socket);
+                        wdtcpSender.start();
+                        break;
+                    }
+                }
+            }
+            else if (msgType == 115) {
+                showToast("self server notification received");
             }
         }
     }
