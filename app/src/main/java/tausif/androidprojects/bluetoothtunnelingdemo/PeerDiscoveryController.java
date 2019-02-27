@@ -77,6 +77,7 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
         Constants.groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
         Constants.isGroupOwner = wifiP2pInfo.isGroupOwner;
+        Constants.isGroupFormed = true;
         if (Constants.isGroupOwner)
             Toast.makeText(context, "wifi direct group owner", Toast.LENGTH_LONG).show();
         else

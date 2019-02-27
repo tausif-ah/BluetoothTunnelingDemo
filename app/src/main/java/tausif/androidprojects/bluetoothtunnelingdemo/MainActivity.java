@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     BTConnectedSocketManager btConnectedSocketManager;
     boolean WDgroupFormed;
     ArrayList<ServerMessage> serverMessages;
+    WDTCPSender wdtcpSender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
         Constants.isGroupOwner = false;
         Constants.isGroupFormed = false;
         Constants.isWebServer = false;
-        initiateDeviceDiscovery();
         WDgroupFormed = false;
+        wdtcpSender = new WDTCPSender();
+        initiateDeviceDiscovery();
     }
 
     @Override
@@ -138,9 +140,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendToServerPressed(View view) {
         if (!Constants.isGroupOwner) {
-            WDTCPSender sender = new WDTCPSender();
+            wdtcpSender = null;
+            wdtcpSender = new WDTCPSender();
             ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
-            sender.setMessage(request);
+            wdtcpSender.setMessage(request);
             Socket socket = null;
             for (WDConnection client: WDConnections
                  ) {
@@ -149,14 +152,28 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            sender.setSocket(socket);
-            sender.start();
+            wdtcpSender.setSocket(socket);
+            wdtcpSender.start();
         }
     }
 
     public void makeSelfServerPressed(View view) {
         Constants.isWebServer = true;
         updateRoleText();
+        wdtcpSender = null;
+        wdtcpSender = new WDTCPSender();
+        ServerMessage makeSelfServer = new ServerMessage(Constants.SELF_SERVER_NOTIFIER, null, 0, Constants.selfWifiName);
+        wdtcpSender.setMessage(makeSelfServer);
+        Socket socket = null;
+        for (WDConnection client: WDConnections
+        ) {
+            if (client.groupOwnerConnection) {
+                socket = client.connectedSocket;
+                break;
+            }
+        }
+        wdtcpSender.setSocket(socket);
+        wdtcpSender.start();
     }
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
@@ -165,14 +182,14 @@ public class MainActivity extends AppCompatActivity {
             serverMessages = new ArrayList<>();
             if (Constants.isGroupOwner) {
                 if (!WDgroupFormed) {
-                    showGroupRole("Group owner");
+                    updateRoleText();
                     ServerConnectionListener serverConnectionListener = new ServerConnectionListener(Constants.WD_WEB_SERVER_LISTENING_PORT, this);
                     serverConnectionListener.start();
                     WDgroupFormed = true;
                 }
             }
             else {
-                showGroupRole("Group client");
+                updateRoleText();
                 ServerConnector serverConnector = new ServerConnector(Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT, this);
                 serverConnector.start();
             }
@@ -205,23 +222,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void messageInServerChannel(ServerMessage message) {
+        int msgType = message.type;
         if (Constants.isGroupOwner) {
-            Log.d("data", message.data);
-            Log.d("source", message.source.getHostAddress());
-            Log.d("destination", String.valueOf(message.destPort));
-            Log.d("type", String.valueOf(message.type));
-            serverMessages.add(message);
-        }
-    }
-
-    public void showGroupRole(final String groupRoleText) {
-        final TextView groupRole = findViewById(R.id.role_textview);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                groupRole.setText(groupRoleText);
+            if (msgType == Constants.SERVER_REQUEST) {
+                Log.d("server request from", message.data);
+                serverMessages.add(message);
             }
-        });
+            else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
+                Log.d("make self server", message.data);
+                serverMessages.add(message);
+            }
+        }
     }
 
     public void showToast(final String message) {

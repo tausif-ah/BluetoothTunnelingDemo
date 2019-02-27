@@ -11,6 +11,7 @@ class Constants {
     static InetAddress groupOwnerAddress;
     static boolean isGroupOwner;
     static boolean isGroupFormed;
+
     static final int WD_WEB_SERVER_LISTENING_PORT = 8383;
     static boolean isWebServer;
 
@@ -21,6 +22,7 @@ class Constants {
 
     static final int SERVER_REQUEST = 106;
     static final int SERVER_RESPONSE = 107;
+    static final int SELF_SERVER_NOTIFIER = 108;
 
     static final int WIFI_DIRECT_CONNECTION = 1000;
     static final int BLUETOOTH_CONNECTION = 1001;
