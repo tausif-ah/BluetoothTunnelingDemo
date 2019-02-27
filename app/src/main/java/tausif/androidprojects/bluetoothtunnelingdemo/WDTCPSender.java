@@ -6,14 +6,14 @@ import java.net.Socket;
 
 public class WDTCPSender extends Thread {
 
-    Socket socket;
+    private Socket socket;
     private ServerMessage message;
 
     void setMessage(ServerMessage message) {
         this.message = message;
     }
 
-    public void setSocket(Socket socket) {
+    void setSocket(Socket socket) {
         this.socket = socket;
     }
 

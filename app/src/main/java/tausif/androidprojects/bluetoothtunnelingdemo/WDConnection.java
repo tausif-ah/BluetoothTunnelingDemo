@@ -7,8 +7,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 class WDConnection extends Thread {
-    InetAddress IPAddr;
-    int port;
+    private InetAddress IPAddr;
+    private int port;
     boolean groupOwnerConnection;
     Socket connectedSocket;
     private MainActivity mainActivity;
@@ -39,7 +39,6 @@ class WDConnection extends Thread {
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());
             }
-
         }
     }
 }

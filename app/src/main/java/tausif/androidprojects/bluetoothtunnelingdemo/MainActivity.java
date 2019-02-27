@@ -102,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice pairedDevice: pairedDevices
                     ) {
-                Device device = new Device(Constants.BLUETOOTH_DEVICE, null, pairedDevice);
-                currentDevice = device;
+                currentDevice = new Device(Constants.BLUETOOTH_DEVICE, null, pairedDevice);
                 break;
             }
         }
@@ -114,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
             btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
             btConnectedSocketManager.start();
         }
-        btConnectedSocketManager.setDevice(currentDevice);
     }
 
     void initiateDeviceDiscovery() {
@@ -215,10 +213,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void processReceivedBTPkt(byte[] readBuffer, long receivingTime) {
-        final String receivedPkt = new String(readBuffer);
-        String splited[] = receivedPkt.split("#");
-        int pktType = Integer.parseInt(splited[0]);
+    public void processReceivedBTPkt(ServerMessage message) {
+        showToast(message.data);
     }
 
     public void messageInServerChannel(ServerMessage message) {
@@ -227,6 +223,8 @@ public class MainActivity extends AppCompatActivity {
             if (msgType == Constants.SERVER_REQUEST) {
                 Log.d("server request from", message.data);
                 serverMessages.add(message);
+                setUpBTConnection();
+                btConnectedSocketManager.sendMessage(message);
             }
             else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
                 Log.d("make self server", message.data);
@@ -242,16 +240,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public void showWDConnections() {
-        Log.d("number of connections", String.valueOf(WDConnections.size()));
-        for (int i = 0; i< WDConnections.size(); i++) {
-            WDConnection client = WDConnections.get(i);
-            Log.d("connection no", String.valueOf(i+1));
-            Log.d("ip address", client.IPAddr.getHostAddress());
-            Log.d("port no", String.valueOf(client.port));
-        }
     }
 
     public void updateRoleText() {
