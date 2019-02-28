@@ -236,20 +236,9 @@ public class MainActivity extends AppCompatActivity {
                      ) {
                     if (message.source == connection.IPAddr) {
                         connection.isWebServerConnection = true;
-                        wdtcpSender = null;
-                        wdtcpSender = new WDTCPSender();
-                        ServerMessage SelfServerNotifierReceived = new ServerMessage(115, null, 0, Constants.selfWifiName);
-                        wdtcpSender.setMessage(SelfServerNotifierReceived);
-                        Socket socket = null;
-                        socket = connection.connectedSocket;
-                        wdtcpSender.setSocket(socket);
-                        wdtcpSender.start();
                         break;
                     }
                 }
-            }
-            else if (msgType == 115) {
-                showToast("self server notification received");
             }
         }
     }
