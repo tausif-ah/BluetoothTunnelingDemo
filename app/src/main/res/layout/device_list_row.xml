@@ -20,13 +20,4 @@
         android:text="@string/connect"
         android:onClick="connectPressed"/>
 
-    <Button
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/send_button"
-        android:background="@android:color/holo_green_light"
-        android:text="@string/send"
-        android:onClick="sendToServerPressed"/>
-
 </LinearLayout>

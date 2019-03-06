@@ -217,6 +217,18 @@ public class MainActivity extends AppCompatActivity {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
             showToast("request from "+message.data);
+            for (WDConnection connection: WDConnections
+                 ) {
+                if (connection.isWebServerConnection) {
+                    wdtcpSender = null;
+                    wdtcpSender = new WDTCPSender();
+                    wdtcpSender.setMessage(message);
+                    Socket socket = connection.connectedSocket;
+                    wdtcpSender.setSocket(socket);
+                    wdtcpSender.start();
+                    break;
+                }
+            }
         }
     }
 
@@ -226,8 +238,19 @@ public class MainActivity extends AppCompatActivity {
             if (msgType == Constants.SERVER_REQUEST) {
                 Log.d("server request from", message.data);
                 serverMessages.add(message);
-                setUpBTConnection();
-                btConnectedSocketManager.sendMessage(message);
+                showToast("request from " + message.data);
+                boolean webServerFound = false;
+                for (WDConnection connection: WDConnections
+                     ) {
+                    if (connection.isWebServerConnection) {
+                        webServerFound = true;
+                        break;
+                    }
+                }
+                if (!webServerFound) {
+                    setUpBTConnection();
+                    btConnectedSocketManager.sendMessage(message);
+                }
             }
             else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
                 Log.d("make self server", message.data);
@@ -239,6 +262,11 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 }
+            }
+        }
+        else {
+            if (Constants.isWebServer) {
+                showToast("request from " + message.data);
             }
         }
     }
