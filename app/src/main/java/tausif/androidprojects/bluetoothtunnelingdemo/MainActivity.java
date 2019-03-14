@@ -138,10 +138,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendToServerPressed(View view) {
         if (!Constants.isGroupOwner) {
-            wdtcpSender = null;
-            wdtcpSender = new WDTCPSender();
+//            wdtcpSender = null;
+//            wdtcpSender = new WDTCPSender();
             ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
-            wdtcpSender.setMessage(request);
+//            wdtcpSender.setMessage(request);
             Socket socket = null;
             for (WDConnection client: WDConnections
                  ) {
@@ -150,18 +150,19 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            wdtcpSender.setSocket(socket);
-            wdtcpSender.start();
+            sendWDTCPPacket(request, socket);
+//            wdtcpSender.setSocket(socket);
+//            wdtcpSender.start();
         }
     }
 
     public void makeSelfServerPressed(View view) {
         Constants.isWebServer = true;
         updateRoleText();
-        wdtcpSender = null;
-        wdtcpSender = new WDTCPSender();
+//        wdtcpSender = null;
+//        wdtcpSender = new WDTCPSender();
         ServerMessage makeSelfServer = new ServerMessage(Constants.SELF_SERVER_NOTIFIER, null, 0, Constants.selfWifiName);
-        wdtcpSender.setMessage(makeSelfServer);
+//        wdtcpSender.setMessage(makeSelfServer);
         Socket socket = null;
         for (WDConnection client: WDConnections
         ) {
@@ -170,8 +171,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
-        wdtcpSender.setSocket(socket);
-        wdtcpSender.start();
+        sendWDTCPPacket(makeSelfServer, socket);
+//        wdtcpSender.setSocket(socket);
+//        wdtcpSender.start();
     }
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
@@ -213,19 +215,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void sendWDTCPPacket(ServerMessage message, Socket socket) {
+        wdtcpSender = null;
+        wdtcpSender = new WDTCPSender();
+        wdtcpSender.setMessage(message);
+        wdtcpSender.setSocket(socket);
+        wdtcpSender.start();
+    }
+
     public void BluetoothMessageReceived(ServerMessage message) {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
-            showToast("request from "+message.data);
+            showToast("request from " + message.data);
             for (WDConnection connection: WDConnections
                  ) {
                 if (connection.isWebServerConnection) {
-                    wdtcpSender = null;
-                    wdtcpSender = new WDTCPSender();
-                    wdtcpSender.setMessage(message);
-                    Socket socket = connection.connectedSocket;
-                    wdtcpSender.setSocket(socket);
-                    wdtcpSender.start();
+                    sendWDTCPPacket(message, connection.connectedSocket);
+//                    wdtcpSender = null;
+//                    wdtcpSender = new WDTCPSender();
+//                    wdtcpSender.setMessage(message);
+//                    Socket socket = connection.connectedSocket;
+//                    wdtcpSender.setSocket(socket);
+//                    wdtcpSender.start();
                     break;
                 }
             }
@@ -234,14 +245,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void messageInServerChannel(ServerMessage message) {
         int msgType = message.type;
-        if (Constants.isGroupOwner) {
-            if (msgType == Constants.SERVER_REQUEST) {
-                Log.d("server request from", message.data);
+        if (msgType == Constants.SERVER_REQUEST) {
+            if (Constants.isGroupOwner) {
                 serverMessages.add(message);
                 showToast("request from " + message.data);
                 boolean webServerFound = false;
                 for (WDConnection connection: WDConnections
-                     ) {
+                ) {
                     if (connection.isWebServerConnection) {
                         webServerFound = true;
                         break;
@@ -252,21 +262,28 @@ public class MainActivity extends AppCompatActivity {
                     btConnectedSocketManager.sendMessage(message);
                 }
             }
-            else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
-                Log.d("make self server", message.data);
+            else {
+                showToast("request from " + message.data);
+                serverMessages.add(message);
+            }
+        }
+        else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
+            if (Constants.isGroupOwner) {
+                showToast(message.data + "marking himself as server");
                 serverMessages.add(message);
                 for (WDConnection connection: WDConnections
-                     ) {
+                ) {
                     if (message.source == connection.IPAddr) {
                         connection.isWebServerConnection = true;
                         break;
                     }
                 }
+                ServerMessage msg = new ServerMessage(Constants.SERVER_REQUEST, Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
+                BluetoothMessageReceived(msg);
             }
-        }
-        else {
-            if (Constants.isWebServer) {
-                showToast("request from " + message.data);
+            else {
+                showToast("marked as server");
+                serverMessages.add(message);
             }
         }
     }
