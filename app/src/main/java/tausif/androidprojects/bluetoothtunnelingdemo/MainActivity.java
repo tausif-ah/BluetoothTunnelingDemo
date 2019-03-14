@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -226,6 +227,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        else if (msgType == Constants.SERVER_RESPONSE) {
+            showToast("response from " + message.data);
+            Socket socket = null;
+            for (WDConnection connection: WDConnections
+                 ) {
+                socket = connection.connectedSocket;
+                break;
+            }
+            if (socket != null) {
+                sendWDTCPPacket(message, socket);
+            }
+        }
     }
 
     public void messageInServerChannel(ServerMessage message) {
@@ -250,6 +263,23 @@ public class MainActivity extends AppCompatActivity {
             else {
                 showToast("request from " + message.data);
                 serverMessages.add(message);
+                ServerMessage response = new ServerMessage(Constants.SERVER_RESPONSE, null, 0, Constants.selfWifiName);
+                response.setDestination(message.source);
+                Socket socket = null;
+                for (WDConnection connection: WDConnections
+                     ) {
+                    if (connection.groupOwnerConnection) {
+                        socket = connection.connectedSocket;
+                        break;
+                    }
+                }
+                sendWDTCPPacket(response, socket);
+            }
+        }
+        else if (msgType == Constants.SERVER_RESPONSE) {
+            showToast("response from " + message.data);
+            if (Constants.isGroupOwner) {
+                btConnectedSocketManager.sendMessage(message);
             }
         }
         else if (msgType == Constants.SELF_SERVER_NOTIFIER) {

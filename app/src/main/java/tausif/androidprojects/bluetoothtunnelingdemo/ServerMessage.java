@@ -6,7 +6,8 @@ import java.net.InetAddress;
 class ServerMessage implements Serializable {
     int type;
     InetAddress source;
-    int destPort;
+    InetAddress destination;
+    private int destPort;
     String data;
 
     ServerMessage(int type, InetAddress source, int destPort, String data) {
@@ -14,5 +15,9 @@ class ServerMessage implements Serializable {
         this.source = source;
         this.destPort = destPort;
         this.data = data;
+    }
+
+    void setDestination(InetAddress destination) {
+        this.destination = destination;
     }
 }
