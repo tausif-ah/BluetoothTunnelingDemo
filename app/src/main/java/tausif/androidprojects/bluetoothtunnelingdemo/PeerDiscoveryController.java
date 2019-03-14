@@ -54,8 +54,10 @@ class PeerDiscoveryController implements WifiP2pManager.ConnectionInfoListener{
             wifiDevices.clear();
         for (WifiP2pDevice device: deviceList.getDeviceList()
                 ) {
-            Device newDevice = new Device(Constants.WIFI_DEVICE, device, null);
-            wifiDevices.add(newDevice);
+            if (device.deviceName != null && device.deviceName.contains("NWSL")) {
+                Device newDevice = new Device(Constants.WIFI_DEVICE, device, null);
+                wifiDevices.add(newDevice);
+            }
         }
     }
 

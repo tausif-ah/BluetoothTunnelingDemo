@@ -4,6 +4,6 @@
     <string name="crtGrp">create group</string>
     <string name="joinGrp">join group</string>
     <string name="connect">connect</string>
-    <string name="send">send to server</string>
+    <string name="send">send server request</string>
     <string name="makeServer">make me the server</string>
 </resources>

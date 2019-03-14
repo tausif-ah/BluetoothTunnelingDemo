@@ -136,33 +136,10 @@ public class MainActivity extends AppCompatActivity {
         peerDiscoveryController.connect(device);
     }
 
-    public void sendToServerPressed(View view) {
-        if (!Constants.isGroupOwner) {
-//            wdtcpSender = null;
-//            wdtcpSender = new WDTCPSender();
-            ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
-//            wdtcpSender.setMessage(request);
-            Socket socket = null;
-            for (WDConnection client: WDConnections
-                 ) {
-                if (client.groupOwnerConnection) {
-                    socket = client.connectedSocket;
-                    break;
-                }
-            }
-            sendWDTCPPacket(request, socket);
-//            wdtcpSender.setSocket(socket);
-//            wdtcpSender.start();
-        }
-    }
-
     public void makeSelfServerPressed(View view) {
         Constants.isWebServer = true;
         updateRoleText();
-//        wdtcpSender = null;
-//        wdtcpSender = new WDTCPSender();
         ServerMessage makeSelfServer = new ServerMessage(Constants.SELF_SERVER_NOTIFIER, null, 0, Constants.selfWifiName);
-//        wdtcpSender.setMessage(makeSelfServer);
         Socket socket = null;
         for (WDConnection client: WDConnections
         ) {
@@ -172,8 +149,21 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         sendWDTCPPacket(makeSelfServer, socket);
-//        wdtcpSender.setSocket(socket);
-//        wdtcpSender.start();
+    }
+
+    public void sendToServerPressed(View view) {
+        if (!Constants.isGroupOwner) {
+            ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
+            Socket socket = null;
+            for (WDConnection client: WDConnections
+                 ) {
+                if (client.groupOwnerConnection) {
+                    socket = client.connectedSocket;
+                    break;
+                }
+            }
+            sendWDTCPPacket(request, socket);
+        }
     }
 
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
@@ -211,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             client = new WDConnection(Constants.groupOwnerAddress, socket, true, this);
+            client.start();
             WDConnections.add(client);
         }
     }
@@ -231,12 +222,6 @@ public class MainActivity extends AppCompatActivity {
                  ) {
                 if (connection.isWebServerConnection) {
                     sendWDTCPPacket(message, connection.connectedSocket);
-//                    wdtcpSender = null;
-//                    wdtcpSender = new WDTCPSender();
-//                    wdtcpSender.setMessage(message);
-//                    Socket socket = connection.connectedSocket;
-//                    wdtcpSender.setSocket(socket);
-//                    wdtcpSender.start();
                     break;
                 }
             }
@@ -269,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
             if (Constants.isGroupOwner) {
-                showToast(message.data + "marking himself as server");
+                showToast(message.data + " marking himself as server");
                 serverMessages.add(message);
                 for (WDConnection connection: WDConnections
                 ) {
@@ -278,12 +263,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 }
-                ServerMessage msg = new ServerMessage(Constants.SERVER_REQUEST, Constants.groupOwnerAddress, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
-                BluetoothMessageReceived(msg);
-            }
-            else {
-                showToast("marked as server");
-                serverMessages.add(message);
             }
         }
     }
