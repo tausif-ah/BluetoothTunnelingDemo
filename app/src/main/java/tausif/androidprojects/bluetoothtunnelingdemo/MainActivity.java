@@ -6,12 +6,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -264,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 showToast("request from " + message.data);
                 serverMessages.add(message);
                 ServerMessage response = new ServerMessage(Constants.SERVER_RESPONSE, null, 0, Constants.selfWifiName);
-                response.setDestination(message.source);
+                response.setDestAddress(message.srcAddress);
                 Socket socket = null;
                 for (WDConnection connection: WDConnections
                      ) {
@@ -288,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                 serverMessages.add(message);
                 for (WDConnection connection: WDConnections
                 ) {
-                    if (message.source == connection.IPAddr) {
+                    if (message.srcAddress == connection.IPAddr) {
                         connection.isWebServerConnection = true;
                         break;
                     }

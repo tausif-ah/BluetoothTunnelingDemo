@@ -5,19 +5,20 @@ import java.net.InetAddress;
 
 class ServerMessage implements Serializable {
     int type;
-    InetAddress source;
-    InetAddress destination;
+    InetAddress srcAddress;
+    int srcPort;
+    InetAddress destAddress;
     private int destPort;
     String data;
 
-    ServerMessage(int type, InetAddress source, int destPort, String data) {
+    ServerMessage(int type, InetAddress srcAddress, int destPort, String data) {
         this.type = type;
-        this.source = source;
+        this.srcAddress = srcAddress;
         this.destPort = destPort;
         this.data = data;
     }
 
-    void setDestination(InetAddress destination) {
-        this.destination = destination;
+    void setDestAddress(InetAddress destAddress) {
+        this.destAddress = destAddress;
     }
 }
