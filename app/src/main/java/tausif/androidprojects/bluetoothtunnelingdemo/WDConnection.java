@@ -37,8 +37,8 @@ class WDConnection extends Thread {
             try {
                 ObjectInputStream ois = new ObjectInputStream(connectedSocket.getInputStream());
                 ServerMessage message = (ServerMessage)ois.readObject();
-                message.source = connectedSocket.getInetAddress();
-                this.IPAddr = message.source;
+                message.srcAddress = connectedSocket.getInetAddress();
+                this.IPAddr = message.srcAddress;
                 mainActivity.messageInServerChannel(message);
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());
