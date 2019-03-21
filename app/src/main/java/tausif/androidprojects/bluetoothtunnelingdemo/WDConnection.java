@@ -8,15 +8,13 @@ import java.net.Socket;
 
 class WDConnection extends Thread {
     InetAddress IPAddr;
-    private int port;
     boolean groupOwnerConnection;
     Socket connectedSocket;
     private MainActivity mainActivity;
     boolean isWebServerConnection;
 
-    WDConnection(InetAddress ipAddr, int port, Socket connectedSocket, MainActivity mainActivity) {
+    WDConnection(InetAddress ipAddr, Socket connectedSocket, MainActivity mainActivity) {
         this.IPAddr = ipAddr;
-        this.port = port;
         this.connectedSocket = connectedSocket;
         this.groupOwnerConnection = false;
         this.mainActivity = mainActivity;
@@ -36,9 +34,9 @@ class WDConnection extends Thread {
         while (connectedSocket != null && connectedSocket.isConnected()) {
             try {
                 ObjectInputStream ois = new ObjectInputStream(connectedSocket.getInputStream());
-                ServerMessage message = (ServerMessage)ois.readObject();
-                message.srcAddress = connectedSocket.getInetAddress();
-                this.IPAddr = message.srcAddress;
+                Message message = (Message)ois.readObject();
+                message.sourceIP = connectedSocket.getInetAddress();
+                this.IPAddr = message.sourceIP;
                 mainActivity.messageInServerChannel(message);
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());

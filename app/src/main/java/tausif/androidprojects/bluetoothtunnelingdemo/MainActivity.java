@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     PeerDiscoveryController peerDiscoveryController;
     BTConnectedSocketManager btConnectedSocketManager;
     boolean WDgroupFormed;
-    ArrayList<ServerMessage> serverMessages;
+    ArrayList<Message> messages;
     WDTCPSender wdtcpSender;
 
     @Override
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     public void makeSelfServerPressed(View view) {
         Constants.isWebServer = true;
         updateRoleText();
-        ServerMessage makeSelfServer = new ServerMessage(Constants.SELF_SERVER_NOTIFIER, null, 0, Constants.selfWifiName);
+        Message makeSelfServer = new Message(Constants.SELF_SERVER_NOTIFIER, "");
         Socket socket = null;
         for (WDConnection client: WDConnections
         ) {
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendToServerPressed(View view) {
         if (!Constants.isGroupOwner) {
-            ServerMessage request = new ServerMessage(Constants.SERVER_REQUEST, null, Constants.WD_WEB_SERVER_LISTENING_PORT, Constants.selfWifiName);
+            Message request = new Message(Constants.SERVER_REQUEST, "");
             Socket socket = null;
             for (WDConnection client: WDConnections
                  ) {
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     public void connectionEstablished(int connectionType, BluetoothSocket connectedSocket) {
         if (connectionType == Constants.WIFI_DIRECT_CONNECTION) {
             WDConnections = new ArrayList<>();
-            serverMessages = new ArrayList<>();
+            messages = new ArrayList<>();
             if (Constants.isGroupOwner) {
                 if (!WDgroupFormed) {
                     updateRoleText();
@@ -193,8 +193,7 @@ public class MainActivity extends AppCompatActivity {
         WDConnection client;
         if (Constants.isGroupOwner) {
             InetAddress srcAddr = socket.getInetAddress();
-            int srcPort = socket.getPort();
-            client = new WDConnection(srcAddr, srcPort, socket, this);
+            client = new WDConnection(srcAddr, socket, this);
             client.start();
             WDConnections.add(client);
         }
@@ -205,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendWDTCPPacket(ServerMessage message, Socket socket) {
+    public void sendWDTCPPacket(Message message, Socket socket) {
         wdtcpSender = null;
         wdtcpSender = new WDTCPSender();
         wdtcpSender.setMessage(message);
@@ -213,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         wdtcpSender.start();
     }
 
-    public void BluetoothMessageReceived(ServerMessage message) {
+    public void BluetoothMessageReceived(Message message) {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
             showToast("request from " + message.data);
@@ -239,11 +238,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void messageInServerChannel(ServerMessage message) {
+    public void messageInServerChannel(Message message) {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
             if (Constants.isGroupOwner) {
-                serverMessages.add(message);
+                messages.add(message);
                 showToast("request from " + message.data);
                 boolean webServerFound = false;
                 for (WDConnection connection: WDConnections
@@ -260,9 +259,8 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 showToast("request from " + message.data);
-                serverMessages.add(message);
-                ServerMessage response = new ServerMessage(Constants.SERVER_RESPONSE, null, 0, Constants.selfWifiName);
-                response.setDestAddress(message.srcAddress);
+                messages.add(message);
+                Message response = new Message(Constants.SERVER_RESPONSE, Constants.selfWifiName);
                 Socket socket = null;
                 for (WDConnection connection: WDConnections
                      ) {
@@ -283,10 +281,10 @@ public class MainActivity extends AppCompatActivity {
         else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
             if (Constants.isGroupOwner) {
                 showToast(message.data + " marking himself as server");
-                serverMessages.add(message);
+                messages.add(message);
                 for (WDConnection connection: WDConnections
                 ) {
-                    if (message.srcAddress == connection.IPAddr) {
+                    if (message.sourceIP == connection.IPAddr) {
                         connection.isWebServerConnection = true;
                         break;
                     }

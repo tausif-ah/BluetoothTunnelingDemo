@@ -16,7 +16,7 @@ public class BTConnectedSocketManager extends Thread {
         this.socket = socket;
     }
 
-    void sendMessage(ServerMessage message) {
+    void sendMessage(Message message) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(message);
@@ -30,7 +30,7 @@ public class BTConnectedSocketManager extends Thread {
         while (socket != null && socket.isConnected()) {
             try {
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                ServerMessage message = (ServerMessage)ois.readObject();
+                Message message = (Message)ois.readObject();
                 // Read from the InputStream.
                 homeActivity.BluetoothMessageReceived(message);
             } catch (Exception e) {

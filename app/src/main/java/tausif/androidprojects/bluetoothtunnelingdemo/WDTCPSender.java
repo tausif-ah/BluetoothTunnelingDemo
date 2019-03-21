@@ -7,9 +7,9 @@ import java.net.Socket;
 public class WDTCPSender extends Thread {
 
     private Socket socket;
-    private ServerMessage message;
+    private Message message;
 
-    void setMessage(ServerMessage message) {
+    void setMessage(Message message) {
         this.message = message;
     }
 
