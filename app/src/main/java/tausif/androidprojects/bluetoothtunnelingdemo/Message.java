@@ -8,9 +8,15 @@ class Message implements Serializable {
     InetAddress sourceIP;
     InetAddress destinationIP;
     String data;
+    boolean interGroupMessage;
 
     Message(int type, String data) {
         this.type = type;
         this.data = data;
+        this.interGroupMessage = false;
+    }
+
+    public void setInterGroupMessage(boolean interGroupMessage) {
+        this.interGroupMessage = interGroupMessage;
     }
 }

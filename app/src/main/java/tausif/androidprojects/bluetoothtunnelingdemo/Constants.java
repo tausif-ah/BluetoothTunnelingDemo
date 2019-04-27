@@ -29,4 +29,6 @@ class Constants {
 
     static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 2000;
     static final int REQUEST_CODE_LOCATION = 2001;
+
+    static boolean BTConnectionEstablished = false;
 }

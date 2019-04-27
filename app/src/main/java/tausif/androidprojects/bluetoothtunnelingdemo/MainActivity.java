@@ -151,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendToServerPressed(View view) {
+        Message message = new Message(Constants.SERVER_REQUEST, Constants.selfWifiName);
         if (!Constants.isGroupOwner) {
-            Message request = new Message(Constants.SERVER_REQUEST, "");
             Socket socket = null;
             for (WDConnection client: WDConnections
                  ) {
@@ -161,7 +161,31 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            sendWDTCPPacket(request, socket);
+            sendWDTCPPacket(message, socket);
+        }
+        else {
+            Socket socket = null;
+            for (WDConnection client: WDConnections
+                 ) {
+                if (client.isWebServerConnection) {
+                    socket = client.connectedSocket;
+                    break;
+                }
+            }
+            if (socket != null) {
+                sendWDTCPPacket(message, socket);
+            }
+            else {
+                message.setInterGroupMessage(true);
+                if (Constants.BTConnectionEstablished) {
+                    btConnectedSocketManager.sendMessage(message);
+                }
+                else {
+                    setUpBTConnection();
+                    Constants.BTConnectionEstablished = true;
+                    btConnectedSocketManager.sendMessage(message);
+                }
+            }
         }
     }
 
