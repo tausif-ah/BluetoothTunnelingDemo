@@ -35,9 +35,11 @@ class WDConnection extends Thread {
             try {
                 ObjectInputStream ois = new ObjectInputStream(connectedSocket.getInputStream());
                 Message message = (Message)ois.readObject();
-                message.sourceIP = connectedSocket.getInetAddress();
-                this.IPAddr = message.sourceIP;
-                mainActivity.messageInServerChannel(message);
+                if (message.sourceIP == null) {
+                    message.sourceIP = connectedSocket.getInetAddress();
+                }
+                this.IPAddr = connectedSocket.getInetAddress();
+                mainActivity.WiFiDirectMessageReceived(message);
             } catch (Exception ex) {
                 Log.e("input stream", ex.getMessage());
             }

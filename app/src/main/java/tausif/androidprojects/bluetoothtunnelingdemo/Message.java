@@ -14,9 +14,14 @@ class Message implements Serializable {
         this.type = type;
         this.data = data;
         this.interGroupMessage = false;
+        this.sourceIP = null;
     }
 
-    public void setInterGroupMessage(boolean interGroupMessage) {
+    void setInterGroupMessage(boolean interGroupMessage) {
         this.interGroupMessage = interGroupMessage;
+    }
+
+    void setDestinationIP(InetAddress destinationIP) {
+        this.destinationIP = destinationIP;
     }
 }

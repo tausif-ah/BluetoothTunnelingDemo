@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else {
+            Constants.BTConnectionEstablished = true;
             btConnectedSocketManager = new BTConnectedSocketManager(connectedSocket, this);
             btConnectedSocketManager.start();
         }
@@ -240,51 +241,72 @@ public class MainActivity extends AppCompatActivity {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
             showToast("request from " + message.data);
-            for (WDConnection connection: WDConnections
-                 ) {
-                if (connection.isWebServerConnection) {
-                    sendWDTCPPacket(message, connection.connectedSocket);
-                    break;
-                }
-            }
-        }
-        else if (msgType == Constants.SERVER_RESPONSE) {
-            showToast("response from " + message.data);
             Socket socket = null;
             for (WDConnection connection: WDConnections
                  ) {
-                socket = connection.connectedSocket;
-                break;
+                if (connection.isWebServerConnection) {
+                    socket = connection.connectedSocket;
+                    break;
+                }
             }
-            if (socket != null) {
+            if (socket != null)
                 sendWDTCPPacket(message, socket);
+            else
+                showToast("Server not found");
+        }
+        else if (msgType == Constants.SERVER_RESPONSE) {
+            showToast("response from " + message.data);
+            message.setInterGroupMessage(false);
+            Socket socket = null;
+            for (WDConnection connection: WDConnections
+                 ) {
+                if (connection.IPAddr.equals(message.destinationIP)) {
+                    socket = connection.connectedSocket;
+                    break;
+                }
             }
+            if (socket != null)
+                sendWDTCPPacket(message, socket);
+            else
+                showToast("Destination not found");
         }
     }
 
-    public void messageInServerChannel(Message message) {
+    public void WiFiDirectMessageReceived(Message message) {
         int msgType = message.type;
         if (msgType == Constants.SERVER_REQUEST) {
             if (Constants.isGroupOwner) {
                 messages.add(message);
                 showToast("request from " + message.data);
-                boolean webServerFound = false;
+//                boolean webServerFound = false;
+                Socket socket = null;
                 for (WDConnection connection: WDConnections
                 ) {
                     if (connection.isWebServerConnection) {
-                        webServerFound = true;
+                        socket = connection.connectedSocket;
+//                        webServerFound = true;
                         break;
                     }
                 }
-                if (!webServerFound) {
-                    setUpBTConnection();
+                if (socket == null) {
+                    if (!Constants.BTConnectionEstablished) {
+                        setUpBTConnection();
+                        Constants.BTConnectionEstablished = true;
+                    }
+                    message.setInterGroupMessage(true);
                     btConnectedSocketManager.sendMessage(message);
+                }
+                else {
+                    message.setInterGroupMessage(false);
+                    sendWDTCPPacket(message, socket);
                 }
             }
             else {
                 showToast("request from " + message.data);
                 messages.add(message);
                 Message response = new Message(Constants.SERVER_RESPONSE, Constants.selfWifiName);
+                response.setDestinationIP(message.sourceIP);
+                response.setInterGroupMessage(message.interGroupMessage);
                 Socket socket = null;
                 for (WDConnection connection: WDConnections
                      ) {
@@ -299,7 +321,27 @@ public class MainActivity extends AppCompatActivity {
         else if (msgType == Constants.SERVER_RESPONSE) {
             showToast("response from " + message.data);
             if (Constants.isGroupOwner) {
-                btConnectedSocketManager.sendMessage(message);
+                if (message.interGroupMessage) {
+                    if (!Constants.BTConnectionEstablished) {
+                        setUpBTConnection();
+                        Constants.BTConnectionEstablished = true;
+                    }
+                    btConnectedSocketManager.sendMessage(message);
+                }
+                else {
+                    Socket socket = null;
+                    for (WDConnection client: WDConnections
+                         ) {
+                        if (client.IPAddr.equals(message.destinationIP)) {
+                            socket = client.connectedSocket;
+                            break;
+                        }
+                    }
+                    if (socket != null)
+                        sendWDTCPPacket(message, socket);
+                    else
+                        showToast("Destination not found");
+                }
             }
         }
         else if (msgType == Constants.SELF_SERVER_NOTIFIER) {
