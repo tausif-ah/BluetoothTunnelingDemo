@@ -278,13 +278,11 @@ public class MainActivity extends AppCompatActivity {
             if (Constants.isGroupOwner) {
                 messages.add(message);
                 showToast("request from " + message.data);
-//                boolean webServerFound = false;
                 Socket socket = null;
                 for (WDConnection connection: WDConnections
                 ) {
                     if (connection.isWebServerConnection) {
                         socket = connection.connectedSocket;
-//                        webServerFound = true;
                         break;
                     }
                 }
